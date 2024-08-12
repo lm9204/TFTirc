@@ -2,7 +2,7 @@ CC = c++
 FLAGS = -Wall -Wextra -Werror -MMD -MP -g3 -std=c++98
 SRCS =	echoserver.cpp
 OBJS = $(SRCS:.cpp=.o)
-NAME = icrserv
+NAME = ircserv
 
 all : $(NAME)
 
