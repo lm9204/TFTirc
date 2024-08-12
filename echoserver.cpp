@@ -1,7 +1,12 @@
 #include <iostream>
+#include <map>
+#include <vector>
 
 #include <unistd.h>
 #include <sys/socket.h>
+#include <sys/event.h>
+#include <fcntl.h>
+
 #include <arpa/inet.h>
 #include <poll.h>
 
@@ -10,9 +15,18 @@
 
 using namespace std;
 
+void change_events(vector<struct kevent>& change_list, uintptr_t ident, int16_t filter,
+		uint16_t flags, uint32_t fflags, intptr_t data, void *udata)
+{
+	struct kevent temp_event;
+
+	EV_SET(&temp_event, ident, filter, flags, fflags, data, udata);
+	change_list.push_back(temp_event);
+}
+
 int main(int argc, char * argv[])
 {
-	int so_server, so_client, server_port;
+	int so_server, server_port;
 	//arguments check without password (with password needs to be equals 3)
 	if (argc != 2 || !(server_port = atoi(argv[1])))
 		return (1);
@@ -21,11 +35,9 @@ int main(int argc, char * argv[])
 
 	//주소 구조체 init
 	struct sockaddr_in	addr_server;
-	struct sockaddr_in	addr_client;
-	socklen_t			client_addr_size;
 
 	//socket create
-	if ((so_server = socket(ADDR_FAMILY, SOCK_STREAM, 0)) == -1)
+	if ((so_server = socket(PF_INET, SOCK_STREAM, 0)) == -1)
 		cerr << "socket error\n";
 	
 	memset(&addr_server, 0, sizeof(addr_server));
@@ -48,74 +60,113 @@ int main(int argc, char * argv[])
 		exit(1);
 	}
 
-	struct pollfd clients[512];
-	for (int i = 0; i < 512; ++i)
-		clients[i].fd = -1;
+	int kq;
+	if ((kq = kqueue()) == -1)
+	{
+		cerr << "kqueue error\n";
+		exit(1);
+	}
 
-	clients[0].fd = so_server;
-	clients[0].events = POLLIN;
+	map<int, string>	clients;
+	vector<struct kevent> change_list;
+	struct kevent	event_list[8];
+	
+	change_events(change_list, so_server, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
+	cout << "Server Started\n";
 
-	int max_i = 0, i = 0;
+	int new_events;
+	struct kevent* curr_event;
 	
 	while (1)
 	{
-		if (poll(clients, max_i + 1, 5000) <= 0)
-			continue;
-		
-		if (clients[0].revents & POLLIN)
+		new_events = kevent(kq, &change_list[0], change_list.size(), event_list, 8, NULL);
+		if (new_events == -1)
 		{
-			client_addr_size = sizeof(addr_client);
-			so_client = accept(so_server, (sockaddr*)&addr_client, &client_addr_size);
-
-			for (i = 1; i < 512; ++i)
-			{
-				if (clients[i].fd < 0)
-				{
-					clients[i].fd = so_client;
-					clients[i].events = POLLIN;
-					break;
-				}
-			}
-
-			if (i == 512)
-				cerr << "too many clients";
-
-			if (i > max_i)
-				max_i = i;
-			cout << so_client << " fd connected\n";
-			continue;
+			cerr << "kevent error\n";
+			exit(1);
 		}
 
-		for (i = 1; i < 512; ++i)
+		change_list.clear();
+		for (int i = 0; i < new_events; ++i)
 		{
-			if (clients[i].fd < 0)
-				continue;
+			curr_event = &event_list[i];
 
-			if (clients[i].revents & POLLIN)
+			if (curr_event->flags & EV_ERROR)
 			{
-				char	buf[BUF_SIZE];
-				size_t	buf_len;
-
-				memset(buf, 0, BUF_SIZE);
-
-				if ((buf_len = recv(so_client, buf, BUF_SIZE, 0)) <= 0)
+				if ((int)curr_event->ident == so_server)
 				{
-					cout << "Client " << clients[i].fd <<" Disconnected\n";
-					close(clients[i].fd);
-					clients[i].fd = -1;
-
-					if (i == max_i)
-						while (clients[max_i].fd < 0)
-							--max_i;
+					cerr << "server socket error\n";
+					exit(1);
 				}
 				else
 				{
-					send(clients[i].fd, buf, buf_len, 0);
-					cout << buf;
+					cerr << "client socket error\n";
+					cout << "client disconnected: " << curr_event->ident << endl;
+					close(curr_event->ident);
+					clients.erase(curr_event->ident);
+				}
+			}
+			else if (curr_event->filter == EVFILT_READ)
+			{
+				if ((int)curr_event->ident == so_server)
+				{
+					int so_client;
+					if ((so_client = accept(so_server, 0, 0)) == -1)
+					{
+						cerr << "accept error\n";
+						exit(1);
+					}
+					cout << "accept new client: " << so_client << "\n";
+					fcntl(so_client, F_SETFL, O_NONBLOCK);
+
+					change_events(change_list, so_client, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
+					change_events(change_list, so_client, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL);
+					clients[so_client] = "";
+				}
+				else if (clients.find(curr_event->ident) != clients.end())
+				{
+					char buf[1024];
+					int n = read(curr_event->ident, buf, sizeof(buf));
+
+					if (n <= 0)
+					{
+						if (n < 0)
+						{
+							cerr << "client read error\n";
+							cout << "client disconnected: " << curr_event->ident << endl;
+							close(curr_event->ident);
+							clients.erase(curr_event->ident);
+						}
+					}
+					else
+					{
+						buf[n] = 0;
+						clients[curr_event->ident] += buf;
+						cout << "received data from " << curr_event->ident << ": " << clients[curr_event->ident] << "\n";
+					}
+				}
+			}
+			else if (curr_event->filter == EVFILT_WRITE)
+			{
+				map<int, string>::iterator it = clients.find(curr_event->ident);
+				if (it != clients.end())
+				{
+					if (clients[curr_event->ident] != "")
+					{
+						int n;
+						if ((n = write(curr_event->ident, clients[curr_event->ident].c_str(), clients[curr_event->ident].size())) == -1)
+						{
+							cerr << "client write error\n";
+							cout << "client disconnected: " << curr_event->ident << endl;
+							close(curr_event->ident);
+							clients.erase(curr_event->ident);
+						}
+						else
+							clients[curr_event->ident].clear();
+					}
 				}
 			}
 		}
 	}
-	close(so_server);
 	return (0);
 }
