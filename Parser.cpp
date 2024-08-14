@@ -20,9 +20,9 @@ std::string Parser::get_command()
     return (buffer);
 }
 
-std::vector<std::string>    Parser::split_command(std::string command)
+std::vector<std::string>    Parser::split_command()
 {
-    std::string     input(command);
+    std::string     input(_buf);
     std::string     buffer;
     std::istringstream   iss(input);
     std::vector<std::string> ret;

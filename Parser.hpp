@@ -11,7 +11,7 @@ class Parser
         Parser(std::string buf, int socket_fd);
         ~Parser();
         std::string get_command();
-        std::vector<std::string>    split_command(std::string command);
+        std::vector<std::string>    split_command();
     private:
         std::string _buf;
         int         _socket_fd;
