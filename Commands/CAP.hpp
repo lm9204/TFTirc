@@ -9,11 +9,8 @@ class CAP: public Command {
 		CAP();
 		CAP(const CAP& other);
 		CAP& operator=(const CAP& other);
-		~CAP();
-		virtual void execute();
-
-	private:
-		
+		virtual ~CAP();
+		virtual void execute(Server& server, Parser& parser);
 };
 
 #endif

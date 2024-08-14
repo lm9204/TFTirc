@@ -9,11 +9,8 @@ class USER: public Command {
 		USER();
 		USER(const USER& other);
 		USER& operator=(const USER& other);
-		~USER();
-		virtual void execute();
-
-	private:
-		
+		virtual ~USER();
+		virtual void execute(Server& server, Parser& parser);
 };
 
 #endif
