@@ -11,14 +11,13 @@ std::string Parser::get_command()
     std::string     line;
     std::string     command;
     std::istringstream   iss(input);
-    if (std::getline(iss, buffer))
-    {
-		buffer = buffer.substr(0, input.find("\r\n"));
-        _buf = _buf.substr(input.find("\r\n") + 2, input.size() - 1);
-        return (buffer);
-    }
-    else
-        return ("");
+    
+	if (_buf.find("\r\n") == std::string::npos)
+		return ("no_comand");
+	std::getline(iss, buffer);
+	buffer = buffer.substr(0, input.find("\r\n"));
+    _buf = _buf.substr(input.find("\r\n") + 2, input.size() - 1);
+    return (buffer);
 }
 
 std::vector<std::string>    Parser::split_command(std::string command)
@@ -29,8 +28,11 @@ std::vector<std::string>    Parser::split_command(std::string command)
     std::vector<std::string> ret;
     while (std::getline(iss, buffer))
     {
+		if (_buf.find("\r\n") == std::string::npos)
+			break;
 		buffer = buffer.substr(0, input.find("\r\n"));
         ret.push_back(buffer);
+		_buf = _buf.substr(input.find("\r\n") + 2, input.size() - 1);
     }
     return (ret);
 }
