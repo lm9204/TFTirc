@@ -26,6 +26,7 @@ std::vector<std::string>    Parser::split_command()
     std::string     buffer;
     std::istringstream   iss(input);
     std::vector<std::string> ret;
+
     while (std::getline(iss, buffer))
     {
 		if (_buf.find("\r\n") == std::string::npos)
@@ -35,4 +36,21 @@ std::vector<std::string>    Parser::split_command()
 		_buf = _buf.substr(input.find("\r\n") + 2, input.size() - 1);
     }
     return (ret);
+}
+
+std::vector<std::string>    Parser::test_split_command(std::string& cmd) {
+    std::istringstream   iss(cmd.substr(0, cmd.size() - 2));
+	std::string			buffer;
+    std::vector<std::string> res;
+
+    while (!iss.eof())
+    {
+		iss >> buffer;
+		res.push_back(buffer);
+    }
+    return (res);
+}
+
+void Parser::sendMsg(const std::string& msg) {
+	send(this->_socket_fd, msg.c_str(), msg.size(), 0);
 }
