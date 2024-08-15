@@ -27,7 +27,7 @@ server:
 	addNewClient(): 새 클라이언트를 생성해서 server에 추가하는 메서드.
 	findNickName(): 닉네임 확인하기
 */
-void NICK::execute(Server& server, Parser& parser) {
+void NICK::execute(Server& server, Client& parser) {
 	static_cast<void>(server);
 	static_cast<void>(parser);
 	// if (server.findClientByNickName(_cmsSource[1]) == NULL)

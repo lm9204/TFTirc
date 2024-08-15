@@ -3,6 +3,8 @@
 # define CAP_HPP
 
 # include "Command.hpp"
+# include "Server.hpp"
+# include "Client.hpp"
 
 class CAP: public Command {
 	public:
@@ -10,7 +12,7 @@ class CAP: public Command {
 		CAP(const CAP& other);
 		CAP& operator=(const CAP& other);
 		virtual ~CAP();
-		virtual void execute(Server& server, Parser& parser);
+		virtual void execute(Server& server, Client& parser);
 };
 
 #endif

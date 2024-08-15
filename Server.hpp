@@ -11,7 +11,8 @@
 # include <arpa/inet.h>
 
 # include "Client.hpp"
-# include "BufferHandler.hpp"
+# include "CommandController.hpp"
+# include "Command.hpp"
 
 # define MAX_USER 512
 

@@ -3,6 +3,8 @@
 # define NICK_HPP
 
 # include "Command.hpp"
+# include "Server.hpp"
+# include "Client.hpp"
 
 class NICK: public Command {
 	public:
@@ -10,7 +12,7 @@ class NICK: public Command {
 		NICK(const NICK& other);
 		NICK& operator=(const NICK& other);
 		virtual ~NICK();
-		virtual void execute(Server& server, Parser& parser);
+		virtual void execute(Server& server, Client& parser);
 };
 
 #endif

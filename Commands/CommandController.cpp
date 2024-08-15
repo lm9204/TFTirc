@@ -1,4 +1,7 @@
 #include "CommandController.hpp"
+#include "CAP.hpp"
+#include "NICK.hpp"
+#include "USER.hpp"
 
 CommandController::CommandController() {
 	this->_commands["CAP"] = new CAP();
@@ -13,11 +16,14 @@ CommandController::~CommandController() {
 	}
 }
 
-Command* CommandController::makeCommand(Parser& parser) {
-	string cmd = parser.get_command();
-	vector<string> cmdSplit = parser.test_split_command(cmd);
+Command* CommandController::makeCommand(Client& parser) {
+	// string cmd = parser.get_command();
+	// vector<string> cmdSplit = parser.test_split_command(cmd);
 	// for (int i = 0; i < cmdSplit.size(); i++)
 	// 	std::cout << cmdSplit[i] << std::endl;
-	_commands[cmdSplit[0]]->setCmdSource(cmdSplit);
-	return this->_commands[cmdSplit[0]];
+	// _commands[cmdSplit[0]]->setCmdSource(cmdSplit);
+	// return this->_commands[cmdSplit[0]];
+	(void)parser;
+	return (NULL);
+	
 }
