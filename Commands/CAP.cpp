@@ -26,8 +26,8 @@ parser:
 server:
 	getHostName(): 클라이언트에게 알릴 서버 이름.
 */
-void CAP::execute(Server& server, Parser& parser) {
+void CAP::execute(Server& server, Client& parser) {
 	static_cast<void>(server);
-	parser.sendMsg("CAP * LS :\r\n");
+	parser.send("CAP * LS :\r\n");
 	// parser.sendMsg(":" + server.getHostName() + " CAP * LS :" + "\r\n");
 }
