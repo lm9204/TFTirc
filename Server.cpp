@@ -1,6 +1,7 @@
 #include "Server.hpp"
+#include "Command.hpp"
 
-Server::Server(int port, string password) : _err_client(Client(-1)), _password(password), _port(port), _socket(-1)
+Server::Server(int port, string password) : _err_client(Client(-1)), _password(password), _port(port), _socket(-1), _command_controller(CommandController())
 {
 	if ((_socket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
 		handle_error("socket error");
@@ -78,11 +79,9 @@ void	Server::run()
 			else if (curr_event->filter == EVFILT_WRITE)
 			{
 				Client& cl = getClient(curr_event->ident);
-				string msg = cl.getBufName();
-				cl.setBuf();
-				if (msg.length() != 0) {
-					cl.send(msg);
-				}
+				Command* cmd = this->_command_controller.makeCommand(cl);
+				if (cmd != NULL)
+					cmd->execute(*this, cl);
 			}
 		}
 	}
