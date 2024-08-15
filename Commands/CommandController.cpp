@@ -2,6 +2,7 @@
 
 CommandController::CommandController() {
 	this->_commands["CAP"] = new CAP();
+	this->_commands["NICK"] = new NICK();
 	this->_commands["USER"] = new USER();
 }
 
@@ -12,6 +13,11 @@ CommandController::~CommandController() {
 	}
 }
 
-Command* CommandController::makeCommand(const string& msg) {
-	return this->_commands[msg];
+Command* CommandController::makeCommand(Parser& parser) {
+	string cmd = parser.get_command();
+	vector<string> cmdSplit = parser.test_split_command(cmd);
+	// for (int i = 0; i < cmdSplit.size(); i++)
+	// 	std::cout << cmdSplit[i] << std::endl;
+	_commands[cmdSplit[0]]->setCmdSource(cmdSplit);
+	return this->_commands[cmdSplit[0]];
 }
