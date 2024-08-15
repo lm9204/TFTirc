@@ -1,7 +1,8 @@
 CC = c++
 FLAGS = -Wall -Wextra -Werror -MMD -MP -g3 -std=c++98
 SRCS =	main.cpp \
-		Server.cpp
+		Server.cpp \
+		Client.cpp 
 OBJS = $(SRCS:.cpp=.o)
 NAME = ircserv
 
