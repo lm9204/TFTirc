@@ -5,7 +5,7 @@ COMMAND_DIR = Commands
 
 SRCS =	main.cpp \
 		Server.cpp \
-		Parser.cpp \
+		Client.cpp \
 		Commands/CommandController.cpp \
 		Commands/Command.cpp \
 		Commands/NICK.cpp \

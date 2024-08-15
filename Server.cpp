@@ -1,8 +1,20 @@
 #include "Server.hpp"
 
-Server::Server(int port, string password) :_password(password), _port(port), _socket(-1)
+Server::Server(int port, string password) : _err_client(Client(-1)), _password(password), _port(port), _socket(-1)
 {
+	if ((_socket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
+		handle_error("socket error");
 
+	memset(&_server_addr, 0, sizeof(_server_addr));
+	_server_addr.sin_family = AF_INET;
+	_server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	_server_addr.sin_port = htons(_port);
+
+	if (bind(_socket, (sockaddr*)&_server_addr, sizeof(_server_addr)) == -1)
+		handle_error("bind error");
+	
+	if (listen(_socket, 5) == -1)
+		handle_error("listen error");
 }
 
 Server::~Server()
@@ -12,32 +24,13 @@ Server::~Server()
 
 void	Server::run()
 {
-	struct sockaddr_in	server_addr;
-
-	if ((_socket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
-		handle_error("socket error");
-
-	memset(&server_addr, 0, sizeof(server_addr));
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	server_addr.sin_port = htons(_port);
-	cout << "init" << "\n";
-
-	if (bind(_socket, (sockaddr*)&server_addr, sizeof(server_addr)) == -1)
-		handle_error("bind error");
-	
-	if (listen(_socket, 5) == -1)
-		handle_error("listen error");
-	
 	int kq;
 	if ((kq = kqueue()) == -1)
 		handle_error("kqueue error");
 
 	map<int, string>		clients;
-	vector<struct kevent>	change_list;
-	struct kevent			event_list[8];
 
-	change_events(change_list, _socket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
+	change_events(_change_list, _socket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
 	cout << "server started\n";
 
 	int new_events;
@@ -45,17 +38,17 @@ void	Server::run()
 
 	while (1)
 	{
-		new_events = kevent(kq, &change_list[0], change_list.size(), event_list, 8, NULL);
+		new_events = kevent(kq, &_change_list[0], _change_list.size(), _event_list, 8, NULL);
 		if (new_events == -1)
 		{
 			cerr << "kevent error\n";
 			exit(1);
 		}
 
-		change_list.clear();
+		_change_list.clear();
 		for (int i = 0; i < new_events; ++i)
 		{
-			curr_event = &event_list[i];
+			curr_event = &_event_list[i];
 
 			if (curr_event->flags & EV_ERROR)
 			{
@@ -74,57 +67,21 @@ void	Server::run()
 			{
 				if ((int)curr_event->ident == _socket)
 				{
-					int so_client;
-					if ((so_client = accept(_socket, 0, 0)) == -1)
-					{
-						cerr << "accept error\n";
-						exit(1);
-					}
-					cout << "accept new client: " << so_client << "\n";
-					fcntl(so_client, F_SETFL, O_NONBLOCK);
-
-					change_events(change_list, so_client, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
-					change_events(change_list, so_client, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL);
-					clients[so_client] = "";
+					cout << "bind Client\n";
+					bindClient();
 				}
-				else if (clients.find(curr_event->ident) != clients.end())
+				else if (getClient(curr_event->ident).getSocketFd() != -1)
 				{
-					char buf[1024];
-					int n = read(curr_event->ident, buf, sizeof(buf));
-
-					if (n <= 0)
-					{
-						if (n < 0)
-						{
-							cerr << "client read error\n";
-							disconnect_client(curr_event->ident, clients);
-						}
-					}
-					else
-					{
-						buf[n] = 0;
-						clients[curr_event->ident] += buf;
-						cout << "received data from " << curr_event->ident << ": " << clients[curr_event->ident] << "\n";
-					}
+					getClient(curr_event->ident).recv();
 				}
 			}
 			else if (curr_event->filter == EVFILT_WRITE)
 			{
-				map<int, string>::iterator it = clients.find(curr_event->ident);
-				if (it != clients.end())
-				{
-					if (clients[curr_event->ident] != "")
-					{
-						int n;
-						cout << "write:" << clients[curr_event->ident] << "\n";
-						if ((n = write(curr_event->ident, clients[curr_event->ident].c_str(), clients[curr_event->ident].size())) == -1)
-						{
-							cerr << "client write error\n";
-							disconnect_client(curr_event->ident, clients);
-						}
-						else
-							clients[curr_event->ident].clear();
-					}
+				Client& cl = getClient(curr_event->ident);
+				string msg = cl.getBufName();
+				cl.setBuf();
+				if (msg.length() != 0) {
+					cl.send(msg);
 				}
 			}
 		}
@@ -145,6 +102,52 @@ void	Server::disconnect_client(int client_fd, map<int, string>& clients)
 	cout << "client disconnected: " << client_fd << endl;
 	close(client_fd);
 	clients.erase(client_fd);
+}
+
+int		Server::bindClient()
+{
+	int so_client;
+	if ((so_client = accept(_socket, 0, 0)) == -1)
+	{
+		cerr << "accept error\n";
+		return (0);
+	}
+	cout << "accept new client: " << so_client << "\n";
+	//setnick user
+	_clients.push_back(Client(so_client));
+	fcntl(so_client, F_SETFL, O_NONBLOCK);
+
+	change_events(_change_list, so_client, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
+	change_events(_change_list, so_client, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL);
+	return (1);
+}
+
+Client&	Server::getClient(int fd)
+{
+	vector<Client>::iterator it = _clients.begin();
+	while (it != _clients.end())
+	{
+		if (fd == (*it).getSocketFd())
+			return (*it);
+		it++;
+	}
+	cout << "cannot find " << fd << " user\n";
+	//throw
+	return _err_client;
+}
+
+Client&	Server::getClient(string nick)
+{
+	vector<Client>::iterator it = _clients.begin();
+	while (it != _clients.end())	
+	{
+		if (nick == (*it).getNickName())
+			return (*it);
+		it++;
+	}
+	cout << "cannot find " << nick << " user\n";
+	//throw
+	return _err_client;
 }
 
 // test error -> exception

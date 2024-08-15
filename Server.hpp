@@ -11,10 +11,9 @@
 # include <arpa/inet.h>
 
 # include "Client.hpp"
-# include "Parser.hpp"
+# include "BufferHandler.hpp"
 
-#define BUF_SIZE 1024
-#define MAX_USER 512
+# define MAX_USER 512
 
 using namespace std;
 class Server
@@ -27,18 +26,28 @@ class Server
 		void	change_events(vector<struct kevent>& change_list, uintptr_t ident, int16_t filter, uint16_t flags, uint32_t fflags, intptr_t data, void *udata);
 		void	disconnect_client(int client_fd, map<int, string>& clients);
 
-		int		apply_client(int client_socket);
+		int		bindClient();
+		Client&	getClient(int fd);
+		Client&	getClient(string nick);
 
 	private:
+		//error Client(-1)
 		//kqueue fd
 		//kevents->changelist
 		//eventlist
 		//vector<client*> _clients;
 		//channel*	_channels;
-		vector<Client *> _clients;
+		vector<Client>	_clients;
+		Client	_err_client;
 		string	_password;
 		int		_port;
-		int		_socket;
+		
+		struct sockaddr_in		_server_addr;
+		int						_socket;
+		vector<struct kevent>	_change_list;
+		struct kevent			_event_list[8];
+
+
 
 };
 
