@@ -2,7 +2,7 @@
 #include "Server.hpp"
 #include "Command.hpp"
 
-Server::Server(int port, string password) : _err_client(Client(-1)), _err_channel("EMPTY"), _command_controller(CommandController()), _password(password), _port(port), _socket(-1)
+Server::Server(int port, string password) :  _command_controller(CommandController()),_err_client(Client(-1)), _err_channel("EMPTY"), _password(password), _port(port), _socket(-1)
 {
 	if ((_socket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
 		handle_error("socket error");
@@ -72,17 +72,17 @@ void	Server::run()
 					cout << "bind Client\n";
 					bindClient();
 				}
-				else if (getClient(curr_event->ident).getSocketFd() != -1)
+				else if (getClient(curr_event->ident)->getSocketFd() != -1)
 				{
-					getClient(curr_event->ident).recv();
+					getClient(curr_event->ident)->recv();
 				}
 			}
 			else if (curr_event->filter == EVFILT_WRITE)
 			{
-				Client& cl = getClient(curr_event->ident);
-				Command* cmd = this->_command_controller.makeCommand(cl);
+				Client* cl = getClient(curr_event->ident);
+				Command* cmd = this->_command_controller.makeCommand(*cl);
 				if (cmd != NULL)
-					cmd->execute(*this, cl);
+					cmd->execute(*this, *cl);
 			}
 		}
 	}
@@ -124,7 +124,7 @@ int		Server::bindClient()
 
 int	Server::createChannel(string ch_name, string owner)
 {
-	if (getChannel(ch_name).getName() != "EMPTY")
+	if (getChannel(ch_name)->getName() != "EMPTY")
 	{
 		cout << "[ERROR] Channel " << ch_name << " is already exist.\n";
 		return (0);
@@ -141,42 +141,42 @@ string	Server::getPassword() const
 	return _password;
 }
 
-Client&	Server::getClient(int fd)
+Client*	Server::getClient(int fd)
 {
 	vector<Client>::iterator it = _clients.begin();
 	while (it != _clients.end())
 	{
 		if (fd == (*it).getSocketFd())
-			return (*it);
+			return &(*it);
 		it++;
 	}
 	cout << "cannot find " << fd << " user\n";
 	//throw
-	return _err_client;
+	return NULL;
 }
 
-Client&	Server::getClient(string nick)
+Client*	Server::getClient(string nick)
 {
 	vector<Client>::iterator it = _clients.begin();
 	while (it != _clients.end())	
 	{
 		if (nick == (*it).getNickName())
-			return (*it);
+			return &(*it);
 		it++;
 	}
 	cout << "cannot find " << nick << " user\n";
 	//throw
-	return _err_client;
+	return NULL;
 }
 
-Channel&	Server::getChannel(string ch_name)
+Channel*	Server::getChannel(string ch_name)
 {
 	for (size_t i = 0; i < _channels.size(); ++i)
 	{
 		if (_channels[i].getName() == ch_name)
-			return _channels[i];
+			return &_channels[i];
 	}
-	return _err_channel;
+	return NULL;
 }
 
 // test error -> exception
