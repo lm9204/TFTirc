@@ -10,9 +10,9 @@ Channel::Channel(string empty) : _name(empty)
 	cout << "[INFO][" << _getTimestamp() << "] Error Channel object created.\n";
 }
 
-Channel::Channel(string name, string owner) : _name(name), _inviteOnly(0), _topicOpOnly(1), _user_limit(0)
+Channel::Channel(string name, Client* owner) : _name(name), _inviteOnly(0), _topicOpOnly(1), _user_limit(0)
 {
-	cout << "[INFO][" << _getTimestamp() << "][Channel: " << name << "] Created Successfully by " << owner << ".\n";
+	cout << "[INFO][" << _getTimestamp() << "][Channel: " << name << "] Created Successfully by " << owner->getNickName() << ".\n";
 	join(owner);
 	setOper(owner);
 }
@@ -22,12 +22,12 @@ Channel::~Channel()
 	cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Channel deleted.\n";
 }
 
-vector<string>	Channel::getUsers() const
+vector<Client*>	Channel::getUsers() const
 {
 	return this->_users;
 }
 
-vector<string>	Channel::getOper() const
+vector<Client*>	Channel::getOper() const
 {
 	return this->_operators;
 }
@@ -48,33 +48,35 @@ string	Channel::getPassword() const
 }
 
 /* */
-int		Channel::isOper(string user) const
+int		Channel::isOper(Client* user) const
 {
-	return _exist(_operators, user);
+	return _exist(_operators, user->getNickName());
 }
 
 /* need oper */
-void	Channel::setOper(string user)
+void	Channel::setOper(Client* user)
 {
-	if (_exist(_operators, user))
-		cout << "[ERROR][" << _getTimestamp() << "][Channel: " << _name << "] " << user << " is already has permission.\n";
+	if (!_exist(_users, user->getNickName()))
+		cout << "[ERROR][" << _getTimestamp() << "][Channel: " << _name << "] " << user->getNickName() << " is not in the channel.\n";
+	else if (_exist(_operators, user->getNickName()))
+		cout << "[ERROR][" << _getTimestamp() << "][Channel: " << _name << "] " << user->getNickName() << " is already has permission.\n";
 	else
 	{
 		_operators.push_back(user);
-		cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] " << user << " is assigned an operator.\n";
+		cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] " << user->getNickName() << " is assigned an operator.\n";
 	}
 }
 
 /* need oper */
-void	Channel::removeOper(string user)
+void	Channel::removeOper(Client* user)
 {
 	int idx;
-	if ((idx = _find(_operators, user)) < 0)
-		cout << "[ERROR][" << _getTimestamp() << "][Channel: " << _name << "] " << user << "is not operator.\n";
+	if ((idx = _find(_operators, user->getNickName())) < 0)
+		cout << "[ERROR][" << _getTimestamp() << "][Channel: " << _name << "] " << user->getNickName() << "is not operator.\n";
 	else
 	{
 		_operators.erase(_operators.begin() + idx);
-		cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] The operator has been removed from the " << user << ".\n"; 
+		cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] The operator has been removed from the " << user->getNickName() << ".\n"; 
 	}
 }
 
@@ -92,41 +94,41 @@ void	Channel::removePassword()
 	cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Password Successfully removed.\n";
 }
 
-void	Channel::join(string user)
+void	Channel::join(Client* user)
 {
-	if (_exist(_users, user))
-		cout << "[ERROR][" << _getTimestamp() << "][Channel: " << _name << "] " << user << " is already in the channel.\n";
+	if (_exist(_users, user->getNickName()))
+		cout << "[ERROR][" << _getTimestamp() << "][Channel: " << _name << "] " << user->getNickName() << " is already in the channel.\n";
 	else
 	{
 		_users.push_back(user);
-		cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] " << user << " joined the channel.\n";
+		cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] " << user->getNickName() << " joined the channel.\n";
 	}
 }
 
-void	Channel::leave(string user)
+void	Channel::leave(Client* user)
 {
 	int idx;
-	if ((idx = _find(_users, user)) < 0)
-		cout << "[ERROR][" << _getTimestamp() << "][Channel: " << _name << "] " << user << "is not in the channel.\n";
+	if ((idx = _find(_users, user->getNickName())) < 0)
+		cout << "[ERROR][" << _getTimestamp() << "][Channel: " << _name << "] " << user->getNickName() << "is not in the channel.\n";
 	else
 	{
 		if (isOper(user))
 			removeOper(user);
 		_users.erase(_users.begin() + idx);
-		cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] " << user << " left the channel.\n"; 
+		cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] " << user->getNickName() << " left the channel.\n"; 
 	}
 }
 
 /* need oper */
-void	Channel::kick(string user)
+void	Channel::kick(Client* user)
 {
 	int idx;
-	if ((idx = _find(_users, user)) < 0)
-		cout << "[ERROR][" << _getTimestamp() << "][Channel: " << _name << "] " << user << " is not in the channel.\n";
+	if ((idx = _find(_users, user->getNickName())) < 0)
+		cout << "[ERROR][" << _getTimestamp() << "][Channel: " << _name << "] " << user->getNickName() << " is not in the channel.\n";
 	else
 	{
 		_users.erase(_users.begin() + idx);
-		cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] " << user << " kicked from the channel.\n";
+		cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] " << user->getNickName() << " kicked from the channel.\n";
 	}
 }
 
@@ -186,10 +188,10 @@ void	Channel::setMode(CHANNEL_OPT type, int value)
  *  @param	nick : The nickname to search for within the group.
  *  @return The index of the nickname if it exists in the group, otherwise -1.
  **/
-int		Channel::_find(vector<string> group, string nick) const
+int		Channel::_find(vector<Client*> group, string nick) const
 {
 	for (size_t i = 0; i < group.size(); ++i)
-		if (group[i] == nick)
+		if (group[i]->getNickName() == nick)
 			return (i);
 	return (-1);
 }
@@ -200,17 +202,17 @@ int		Channel::_find(vector<string> group, string nick) const
  *  @param	nick : The nickname to search for within the group.
  *  @return 1 if it exists in the group, otherwise 0.
  **/
-int		Channel::_exist(vector<string> group, string nick) const
+int		Channel::_exist(vector<Client*> group, string nick) const
 {
 	for (size_t i = 0; i < group.size(); ++i)
-		if (group[i] == nick)
+		if (group[i]->getNickName() == nick)
 			return (1);
 	return (0);
 }
 
 std::ostream&	operator<<(std::ostream& os, const Channel& ch)
 {
-	vector<string> users = ch.getUsers();
+	vector<Client*> users = ch.getUsers();
 	os << "----------------------------------------------------\n";
 	os << "[INFO][" << ch._getTimestamp() << "][Channel: " << ch.getName() << "] Summary: \n";
 	os << "\t - Channel Mode Settings\n";

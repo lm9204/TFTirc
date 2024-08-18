@@ -34,14 +34,14 @@ class Server
 		void	deleteChannel(string ch_name); // *
 		string	getPassword() const; // *
 		
-		Client&		getClient(int fd);
-		Client&		getClient(string nick);
-		Channel&	getChannel(string ch_name);
+		Client*		getClient(int fd);
+		Client*		getClient(string nick);
+		Channel*	getChannel(string ch_name);
 
 
 	private:
 		//error Client(-1)
-    CommandController		_command_controller;
+		CommandController		_command_controller;
 		vector<Channel> _channels;
 		vector<Client>	_clients;
 		Client	_err_client;
