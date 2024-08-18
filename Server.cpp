@@ -1,7 +1,8 @@
+#include <iostream>
 #include "Server.hpp"
 #include "Command.hpp"
 
-Server::Server(int port, string password) : _err_client(Client(-1)), _password(password), _port(port), _socket(-1), _command_controller(CommandController())
+Server::Server(int port, string password) : _err_client(Client(-1)), _err_channel("EMPTY"), _command_controller(CommandController()), _password(password), _port(port), _socket(-1)
 {
 	if ((_socket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
 		handle_error("socket error");
@@ -121,6 +122,25 @@ int		Server::bindClient()
 	return (1);
 }
 
+int	Server::createChannel(string ch_name, string owner)
+{
+	if (getChannel(ch_name).getName() != "EMPTY")
+	{
+		cout << "[ERROR] Channel " << ch_name << " is already exist.\n";
+		return (0);
+	}
+	else
+	{
+		_channels.push_back(Channel(ch_name, owner));
+		return (1);
+	}
+}
+
+string	Server::getPassword() const
+{
+	return _password;
+}
+
 Client&	Server::getClient(int fd)
 {
 	vector<Client>::iterator it = _clients.begin();
@@ -147,6 +167,16 @@ Client&	Server::getClient(string nick)
 	cout << "cannot find " << nick << " user\n";
 	//throw
 	return _err_client;
+}
+
+Channel&	Server::getChannel(string ch_name)
+{
+	for (size_t i = 0; i < _channels.size(); ++i)
+	{
+		if (_channels[i].getName() == ch_name)
+			return _channels[i];
+	}
+	return _err_channel;
 }
 
 // test error -> exception
