@@ -122,7 +122,7 @@ int		Server::bindClient()
 	return (1);
 }
 
-int	Server::createChannel(string ch_name, string owner)
+int	Server::createChannel(string ch_name, Client* owner)
 {
 	if (getChannel(ch_name)->getName() != "EMPTY")
 	{
