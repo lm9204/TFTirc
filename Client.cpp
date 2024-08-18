@@ -3,7 +3,7 @@
 
 #include "Client.hpp"
 
-Client::Client(int fd) : _fd(fd)
+Client::Client(int fd) : _nick("*"), _fd(fd)
 {
 	cout << "new client connect. user: " << _nick << "socket: " << _fd << "\n";
 }
@@ -33,6 +33,11 @@ string	Client::who() const
 string	Client::getNickName() const
 {
 	return (_nick);
+}
+
+string Client::getUserName() const
+{
+	return (_user);
 }
 
 string	Client::getHostName() const
@@ -118,6 +123,7 @@ int		Client::send(const string& msg) const
 {
 	int n;
 	// valid fd
+	cout << "send: " << "[" << msg << "]" << endl;
 	if ((n = write(_fd, msg.c_str(), msg.size())) == -1)
 	{
 		cerr << "client write error\n";
