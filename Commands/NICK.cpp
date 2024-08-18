@@ -1,4 +1,6 @@
 #include "NICK.hpp"
+#include <cctype>
+#include <sstream>
 
 NICK::NICK() {
 	
@@ -19,7 +21,61 @@ NICK::~NICK() {
 
 }
 
-void NICK::execute(Server& server, Client& parser) {
+void NICK::execute(Server& server, Client& client) {
+	// 파라미터 확인
+	if (this->_cmdSource.size() < 2) {
+		client.send(makeNumericMsg(server, client, ERR_NONICKNAMEGIVEN));
+		return ;
+	}
+	// 유효 닉네임 확인
+	if (!checkNickName(this->_cmdSource[1])) {
+		client.send(makeNumericMsg(server, client, ERR_ERRONEUSNICKNAME));
+		return ;
+	}
+	// 중복 닉네임
+	try {
+		Client& getClient = server.getClient(this->_cmdSource[1]);
+		if (getClient.getSocketFd() != -1) {
+			client.send(makeNumericMsg(server, client, ERR_NICKNAMEINUSE));
+			return ;
+		}
+	} catch (exception& e) {
+	}
+	// client.send(":" + client.getNickName() + "!" + client.getUserName() + "@" + server.getHostName() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
+	client.send(":" + client.getNickName() + "!" + "testa" + "@" + "testb" + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
+	client.setNickName(this->_cmdSource[1]);
+}
+
+string NICK::makeNumericMsg(Server& server, Client& client, int num) {
+	stringstream ss;
+	string res = "";
+	ss << num;
+
 	static_cast<void>(server);
-	static_cast<void>(parser);
+	// res += ":" + server.getHostName() + " ";
+	res += string(":") + "server" + " " + ss.str() + " ";
+	if (num == ERR_NONICKNAMEGIVEN) {
+		res += client.getNickName() + " " + ":No nickname given" + "\r\n";
+	} else if (num == ERR_ERRONEUSNICKNAME) {
+		res += client.getNickName() + " " + this->_cmdSource[1] + " " + ":Erroneus nickname" + "\r\n";
+	} else if (num == ERR_NICKNAMEINUSE) {
+		res += client.getNickName() + " " + this->_cmdSource[1] + " " + ":Nickname is already in use" + "\r\n";
+	}
+	return res;
+}
+
+
+/*
+- 모든 영숫자 문자, 대괄호 및 중괄호([]{}), 백슬래시(\), 파이프(|) 문자를 허용
+- 첫번째 문자는 숫자를 허용하지 않음
+- 명령어에 모호성을 주지 않는한 추가문자 허용 가능
+*/
+bool	NICK::checkNickName(const string& nickName) {
+	if (isdigit(nickName[0]))
+		return false;
+	string allowChar("[]{}\\|");
+	for (string::const_iterator it = nickName.begin() + 1; it != nickName.end(); it++)
+		if (!isalnum(*it) && allowChar.find(*it) == string::npos)
+			return false;
+	return true;
 }
