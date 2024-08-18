@@ -3,12 +3,12 @@
 
 # include "Command.hpp"
 
-class Pass : public Command {
+class PASS : public Command {
 	public:
-		Pass();
-		Pass(const Pass& other);
-		Pass& operator=(const Pass& other);
-		virtual ~Pass();
+		PASS();
+		PASS(const PASS& other);
+		PASS& operator=(const PASS& other);
+		virtual ~PASS();
 		virtual void	execute(Server& server, Client& client);
 };
 
