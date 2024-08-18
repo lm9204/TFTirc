@@ -12,9 +12,10 @@
 # include "Client.hpp"
 # include "Channel.hpp"
 # include "CommandController.hpp"
-# include "Command.hpp"
+
 
 # define MAX_USER 512
+class CommandController;
 
 using namespace std;
 class Server
@@ -40,6 +41,7 @@ class Server
 
 	private:
 		//error Client(-1)
+    CommandController		_command_controller;
 		vector<Channel> _channels;
 		vector<Client>	_clients;
 		Client	_err_client;
@@ -51,7 +53,6 @@ class Server
 		struct sockaddr_in		_server_addr;
 		struct kevent			_event_list[8];
 		int						_socket;
-
 
 
 };

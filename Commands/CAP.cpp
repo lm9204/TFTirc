@@ -19,15 +19,10 @@ CAP::~CAP() {
 
 }
 
-/*
-parser:
-	sendMsg(): 파서가 가지고 있는 소켓으로 인자 메시지를 send 해주는 메서드
-
-server:
-	getHostName(): 클라이언트에게 알릴 서버 이름.
-*/
-void CAP::execute(Server& server, Client& parser) {
+void CAP::execute(Server& server, Client& client) {
 	static_cast<void>(server);
-	parser.send("CAP * LS :\r\n");
-	// parser.sendMsg(":" + server.getHostName() + " CAP * LS :" + "\r\n");
+	for (vector<string>::iterator it = this->_cmdSource.begin(); it != this->_cmdSource.end(); it++)
+		if (*it == "END")
+			return ;
+	client.send("CAP * LS :\r\n");
 }
