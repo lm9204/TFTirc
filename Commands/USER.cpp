@@ -39,7 +39,8 @@ void USER::execute(Server& server, Client& client) {
 	// }
 	client.setUserName(this->_cmdSource[1]);
 	client.setRealName(this->_cmdSource[4]);
-	client.send(makeNumericMsg(server, client, RPL_WELCOME));
+	if (client.getNickName() != "*")
+		client.send(makeNumericMsg(server, client, RPL_WELCOME));
 }
 
 string USER::makeNumericMsg(Server& server, Client& client, const char *num) {
@@ -56,6 +57,8 @@ string USER::makeNumericMsg(Server& server, Client& client, const char *num) {
 		res += client.getNickName() + " " + this->_cmdSource[0] + " " + ":Not enough parameters" + "\r\n";
 	} else if (string(num) == string(ERR_ALREADYREGISTERED)) {
 		res += client.getNickName() + " " + ":You may not reregister" + "\r\n";
+	} else if (string(num) == string(ERR_NONICKNAMEGIVEN)) {
+		res += client.getNickName() + " " + ":No nickname given" + "\r\n";
 	}
 	return res;
 }

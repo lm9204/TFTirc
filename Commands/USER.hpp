@@ -8,6 +8,7 @@
 # define RPL_WELCOME "001"
 # define ERR_NEEDMOREPARAMS "461"
 # define ERR_ALREADYREGISTERED "462"
+# define ERR_NONICKNAMEGIVEN "431"
 
 class USER: public Command {
 	public:
