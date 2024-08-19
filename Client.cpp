@@ -3,7 +3,7 @@
 
 #include "Client.hpp"
 
-Client::Client(int fd) : _fd(fd)
+Client::Client(int fd) : _nick("*"), _user("*"), _host("*"), _real("*"), _fd(fd)
 {
 	cout << "new client connect. user: " << _nick << "socket: " << _fd << "\n";
 }
@@ -43,6 +43,11 @@ string	Client::getHostName() const
 string	Client::getRealName() const
 {
 	return (_real);
+}
+
+string	Client::getUserName() const
+{
+	return (_user);
 }
 
 string	Client::getBuf() const
