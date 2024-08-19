@@ -6,6 +6,7 @@
 # include "Server.hpp"
 # include "Client.hpp"
 
+
 class NICK: public Command {
 	public:
 		NICK();
@@ -13,6 +14,7 @@ class NICK: public Command {
 		NICK& operator=(const NICK& other);
 		virtual ~NICK();
 		virtual void execute(Server& server, Client& parser);
+		bool	checkNickName(const string& nickName);
 };
 
 #endif

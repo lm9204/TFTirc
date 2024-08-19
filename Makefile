@@ -6,6 +6,7 @@ COMMAND_DIR = Commands
 SRCS =	main.cpp \
 		Server.cpp \
 		Client.cpp \
+		Channel.cpp \
 		Commands/CommandController.cpp \
 		Commands/Command.cpp \
 		Commands/NICK.cpp \

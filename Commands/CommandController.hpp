@@ -2,10 +2,10 @@
 #ifndef COMMANDCONTROLLER_HPP
 # define COMMANDCONTROLLER_HPP
 
-# include "Server.hpp"
 # include "Client.hpp"
-
+# include <map>
 class Command;
+class Client;
 
 class CommandController {
 	public:

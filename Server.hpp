@@ -1,6 +1,5 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
-# include <iostream>
 # include <map>
 # include <vector>
 # include <unistd.h>
@@ -11,10 +10,12 @@
 # include <arpa/inet.h>
 
 # include "Client.hpp"
+# include "Channel.hpp"
 # include "CommandController.hpp"
-# include "Command.hpp"
+
 
 # define MAX_USER 512
+class CommandController;
 
 using namespace std;
 class Server
@@ -28,26 +29,30 @@ class Server
 		void	disconnect_client(int client_fd, map<int, string>& clients);
 
 		int		bindClient();
-		Client&	getClient(int fd);
-		Client&	getClient(string nick);
+		int		createChannel(string ch_name, Client* owner);
+
+		void	deleteChannel(string ch_name); // *
+		string	getPassword() const; // *
+		
+		Client*		getClient(int fd);
+		Client*		getClient(string nick);
+		Channel*	getChannel(string ch_name);
+
 
 	private:
 		//error Client(-1)
-		//kqueue fd
-		//kevents->changelist
-		//eventlist
-		//vector<client*> _clients;
-		//channel*	_channels;
+		CommandController		_command_controller;
+		vector<Channel> _channels;
 		vector<Client>	_clients;
 		Client	_err_client;
+		Channel	_err_channel;
 		string	_password;
 		int		_port;
 		
-		struct sockaddr_in		_server_addr;
-		int						_socket;
 		vector<struct kevent>	_change_list;
+		struct sockaddr_in		_server_addr;
 		struct kevent			_event_list[8];
-
+		int						_socket;
 
 
 };
