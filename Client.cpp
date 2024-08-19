@@ -8,16 +8,6 @@ Client::Client(int fd) : _nick("*"), _user("*"), _host("*"), _real("*"), _fd(fd)
 	cout << "new client connect. user: " << _nick << "socket: " << _fd << "\n";
 }
 
-// Client::Client(string nick, string names, int fd) : _nick(nick), _fd(fd)
-// {
-// 	vector<string> split_names = split(names, ' ');
-// 	// if (names.size() != 4) //handle_error
-// 	_user = split_names[0];
-// 	_host = split_names[1];
-// 	_real = split_names[2];
-// 	cout << "new client connect. user: " << _nick << "socket: " << _fd << "\n";
-// }
-
 Client::~Client()
 {
 
@@ -73,7 +63,6 @@ string	Client::getCommand()
 
 void		Client::setNickName(string nick)
 {
-	//중복 체크
 	_nick = nick;
 }
 
@@ -122,7 +111,6 @@ int		Client::recv()
 int		Client::send(const string& msg) const
 {
 	int n;
-	// valid fd
 	if ((n = write(_fd, msg.c_str(), msg.size())) == -1)
 	{
 		cerr << "client write error\n";
