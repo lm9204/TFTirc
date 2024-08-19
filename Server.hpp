@@ -29,7 +29,7 @@ class Server
 		void	disconnect_client(int client_fd, map<int, string>& clients);
 
 		int		bindClient();
-		int		createChannel(string ch_name, string owner);
+		int		createChannel(string ch_name, Client* owner);
 
 		void	deleteChannel(string ch_name); // *
 		string	getPassword() const; // *

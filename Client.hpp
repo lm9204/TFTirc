@@ -20,6 +20,7 @@ class Client
 		int		send(const string& msg) const;
 
 		string	getNickName() const;
+		string	getUserName() const;
 		string	getHostName() const;
 		string	getRealName() const;
 		string	getBufName() const;
