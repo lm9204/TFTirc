@@ -11,7 +11,7 @@ using namespace std;
 class Client
 {
 	public:
-		Client(int fd);
+		Client(int fd, string client_addr);
 		~Client();
 
 		vector<string>	split(string line, char delim);

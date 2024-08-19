@@ -3,7 +3,7 @@
 
 #include "Client.hpp"
 
-Client::Client(int fd) : _nick("*"), _user("*"), _host("*"), _real("*"), _fd(fd)
+Client::Client(int fd, string client_addr) : _nick("*"), _host(client_addr), _fd(fd)
 {
 	cout << "new client connect. user: " << _nick << "socket: " << _fd << "\n";
 }
