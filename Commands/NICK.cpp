@@ -32,7 +32,7 @@ void NICK::execute(Server& server, Client& client) {
 		client.send(makeNumericMsg(server, client, ERR_ERRONEUSNICKNAME));
 		return ;
 	}
-	// 중복 닉네임
+	// 중복 닉네임 확인
 	Client* findClient = server.getClient(this->_cmdSource[1]);
 	if (findClient != NULL) {
 		client.send(makeNumericMsg(server, client, ERR_NICKNAMEINUSE));
@@ -44,27 +44,6 @@ void NICK::execute(Server& server, Client& client) {
 	if (client.getUserName() != "" && client.getRealName() != "")
 		client.send(makeNumericMsg(server, client, RPL_WELCOME));
 }
-
-string NICK::makeNumericMsg(Server& server, Client& client, string num) {
-	string res = "";
-
-	static_cast<void>(server);
-	// res += ":" + server.getHostName() + " ";
-	res += string(":") + "server" + " " + num + " ";
-	if (num == RPL_WELCOME) {
-		// <client> :Welcome to the <networkname> Network, <nick>[!<user>@<host>]\r\n
-		res += client.getNickName() + " :Welcome to the " + client.getHostName() + " NetWork, " + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + "\r\n";
-		// res += client.getNickName() + " :Welcome to the " + "server" + " NetWork, " + client.getNickName() + "!" + "username" + "@" + "server" + "\r\n";
-	} else if (num == ERR_NONICKNAMEGIVEN) {
-		res += client.getNickName() + " " + ":No nickname given" + "\r\n";
-	} else if (num == ERR_ERRONEUSNICKNAME) {
-		res += client.getNickName() + " " + this->_cmdSource[1] + " " + ":Erroneus nickname" + "\r\n";
-	} else if (num == ERR_NICKNAMEINUSE) {
-		res += client.getNickName() + " " + this->_cmdSource[1] + " " + ":Nickname is already in use" + "\r\n";
-	}
-	return res;
-}
-
 
 /*
 - 모든 영숫자 문자, 대괄호 및 중괄호([]{}), 백슬래시(\), 파이프(|) 문자를 허용

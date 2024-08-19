@@ -1,7 +1,13 @@
 #ifndef COMMAND_HPP
 # define COMMAND_HPP
-
 # include "Server.hpp"
+
+# define RPL_WELCOME				"001"
+# define ERR_NONICKNAMEGIVEN		"431"
+# define ERR_ERRONEUSNICKNAME		"432"
+# define ERR_NICKNAMEINUSE			"433"
+# define ERR_NEEDMOREPARAMS			"461"
+# define ERR_ALREADYREGISTERED		"462"
 
 using namespace std;
 
@@ -14,10 +20,10 @@ class Command {
 		Command(const Command& other);
 		Command& operator=(const Command& other);
 		virtual ~Command();
-		virtual void execute(Server& server, Client& parser) = 0;
+		virtual void execute(Server& server, Client& client) = 0;
 		void setCmdSource(vector<string>& cmdSource);
-		string makeNumericMsg(const string& hostName, const string& number); // Numeric 메시지 생성함수. 아직 미구현
-
+		const string makeNumericMsg(Server& server, Client& client, const string& num);
+		
 	protected:
 		vector<string> _cmdSource;
 };
