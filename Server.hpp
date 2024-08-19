@@ -35,6 +35,7 @@ class Server
 
 		void	deleteChannel(string ch_name); // *
 		string	getPassword() const; // *
+		string	getHostname() const;
 		
 		Client*		getClient(int fd);
 		Client*		getClient(string nick);
@@ -49,6 +50,7 @@ class Server
 		Client	_err_client;
 		Channel	_err_channel;
 		string	_password;
+		string	_name;
 		int		_port;
 		
 		vector<struct kevent>	_change_list;

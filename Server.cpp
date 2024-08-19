@@ -141,6 +141,11 @@ string	Server::getPassword() const
 	return _password;
 }
 
+string	Server::getHostname() const
+{
+	return _name;
+}
+
 Client*	Server::getClient(int fd)
 {
 	vector<Client>::iterator it = _clients.begin();
