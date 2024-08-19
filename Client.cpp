@@ -45,7 +45,7 @@ string	Client::getRealName() const
 	return (_real);
 }
 
-string	Client::getBufName() const
+string	Client::getBuf() const
 {
 	return (_buf);
 }
