@@ -15,6 +15,8 @@
 
 
 # define MAX_USER 512
+# define HOST "TFTirc"
+
 class CommandController;
 
 using namespace std;
