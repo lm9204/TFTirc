@@ -32,8 +32,7 @@ class Client
 		void	setHostName(string host);
 		void	setRealName(string real);
 
-		string flushBuf();
-		void setBuf();
+		void	flushBuf();
 	private:
 		string	_nick;
 		string	_user;

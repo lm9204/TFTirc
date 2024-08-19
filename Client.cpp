@@ -132,12 +132,7 @@ vector<string>	Client::split(string line, char delim)
 	return (res);
 }
 
-string Client::flushBuf() {
-	string s = this->_buf;
-	this->_buf = "";
-	return s;
-}
-
-void Client::setBuf() {
+void Client::flushBuf()
+{
 	this->_buf.clear();
 }
