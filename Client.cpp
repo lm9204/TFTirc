@@ -25,6 +25,11 @@ string	Client::getNickName() const
 	return (_nick);
 }
 
+string Client::getUserName() const
+{
+	return (_user);
+}
+
 string	Client::getHostName() const
 {
 	return (_host);

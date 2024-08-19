@@ -33,28 +33,29 @@ void NICK::execute(Server& server, Client& client) {
 		return ;
 	}
 	// 중복 닉네임
-	try {
-		Client& getClient = server.getClient(this->_cmdSource[1]);
-		if (getClient.getSocketFd() != -1) {
-			client.send(makeNumericMsg(server, client, ERR_NICKNAMEINUSE));
-			return ;
-		}
-	} catch (exception& e) {
+	Client* findClient = server.getClient(this->_cmdSource[1]);
+	if (findClient != NULL) {
+		client.send(makeNumericMsg(server, client, ERR_NICKNAMEINUSE));
+		return ;
 	}
-	// client.send(":" + client.getNickName() + "!" + client.getUserName() + "@" + server.getHostName() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
-	client.send(":" + client.getNickName() + "!" + "testa" + "@" + "testb" + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
+	client.send(":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
+	// client.send(":" + client.getNickName() + "!" + "testa" + "@" + "testb" + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
 	client.setNickName(this->_cmdSource[1]);
+	if (client.getUserName() != "" && client.getRealName() != "")
+		client.send(makeNumericMsg(server, client, RPL_WELCOME));
 }
 
-string NICK::makeNumericMsg(Server& server, Client& client, int num) {
-	stringstream ss;
+string NICK::makeNumericMsg(Server& server, Client& client, string num) {
 	string res = "";
-	ss << num;
 
 	static_cast<void>(server);
 	// res += ":" + server.getHostName() + " ";
-	res += string(":") + "server" + " " + ss.str() + " ";
-	if (num == ERR_NONICKNAMEGIVEN) {
+	res += string(":") + "server" + " " + num + " ";
+	if (num == RPL_WELCOME) {
+		// <client> :Welcome to the <networkname> Network, <nick>[!<user>@<host>]\r\n
+		res += client.getNickName() + " :Welcome to the " + client.getHostName() + " NetWork, " + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + "\r\n";
+		// res += client.getNickName() + " :Welcome to the " + "server" + " NetWork, " + client.getNickName() + "!" + "username" + "@" + "server" + "\r\n";
+	} else if (num == ERR_NONICKNAMEGIVEN) {
 		res += client.getNickName() + " " + ":No nickname given" + "\r\n";
 	} else if (num == ERR_ERRONEUSNICKNAME) {
 		res += client.getNickName() + " " + this->_cmdSource[1] + " " + ":Erroneus nickname" + "\r\n";
