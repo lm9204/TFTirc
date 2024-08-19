@@ -2,7 +2,7 @@
 #include "Server.hpp"
 #include "Command.hpp"
 
-Server::Server(int port, string password) :  _command_controller(CommandController()),_err_client(Client(-1)), _err_channel("EMPTY"), _password(password), _port(port), _socket(-1)
+Server::Server(int port, string password) :  _command_controller(CommandController()), _password(password), _name(HOST), _port(port), _socket(-1)
 {
 	if ((_socket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
 		handle_error("socket error");
@@ -122,7 +122,7 @@ int		Server::bindClient()
 	return (1);
 }
 
-int	Server::createChannel(string ch_name, string owner)
+int	Server::createChannel(string ch_name, Client* owner)
 {
 	if (getChannel(ch_name)->getName() != "EMPTY")
 	{
