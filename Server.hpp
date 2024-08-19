@@ -35,7 +35,7 @@ class Server
 
 		void	deleteChannel(string ch_name); // *
 		string	getPassword() const; // *
-		string	getHostname() const;
+		string	getServername() const;
 		
 		Client*		getClient(int fd);
 		Client*		getClient(string nick);

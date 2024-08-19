@@ -141,7 +141,7 @@ string	Server::getPassword() const
 	return _password;
 }
 
-string	Server::getHostname() const
+string	Server::getServername() const
 {
 	return _name;
 }
