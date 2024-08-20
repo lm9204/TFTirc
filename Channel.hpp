@@ -36,7 +36,8 @@ class Channel
 		void	join(Client* user);
 		void	leave(Client* user);
 		void	kick(Client* user);
-		void	setTopic(string topic);
+		void	broadcast(string msg);
+		void	broadcast(string msg, Client* except_client);
 
 		int		getMode(CHANNEL_OPT type) const;
 		void	setMode(CHANNEL_OPT type, int value);

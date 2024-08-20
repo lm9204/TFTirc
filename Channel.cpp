@@ -132,11 +132,23 @@ void	Channel::kick(Client* user)
 	}
 }
 
-void	Channel::setTopic(string topic)
+void	Channel::broadcast(string msg)
 {
-	this->_topic = topic;
-	cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Channel topic changed to " << topic << ".\n";
+	for (vector<Client*>::const_iterator it = _users.begin(); it != _users.end(); ++it)
+	{
+		(*it)->send(msg);
+	}
 }
+
+void	Channel::broadcast(string msg, Client* except_client)
+{
+	for (vector<Client*>::const_iterator it = _users.begin(); it != _users.end(); ++it)
+	{
+		if (except_client != *it)
+			(*it)->send(msg);
+	}
+}
+
 
 int	Channel::getMode(CHANNEL_OPT type) const
 {
