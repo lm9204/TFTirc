@@ -16,7 +16,7 @@ Client::~Client()
 string	Client::who() const
 {
 	if (_nick.length() != 0 && _host.length() != 0)
-		return (_nick + "!" + _nick + "@" + _host);
+		return (_nick + "!" + _user + "@" + _host);
 	return (NULL);
 }
 
