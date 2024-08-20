@@ -23,7 +23,7 @@ class Client
 		string	getUserName() const;
 		string	getHostName() const;
 		string	getRealName() const;
-  
+
 		string	getBuf() const;
 		int		getSocketFd() const;
 		string	getCommand();
