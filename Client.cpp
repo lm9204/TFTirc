@@ -40,11 +40,6 @@ string	Client::getRealName() const
 	return (_real);
 }
 
-string	Client::getUserName() const
-{
-	return (_user);
-}
-
 string	Client::getBuf() const
 {
 	return (_buf);
