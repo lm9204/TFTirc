@@ -28,10 +28,11 @@ class Channel
 		string	getPassword() const;
 
 		int		isOper(Client* user) const;
-
 		void	setOper(Client* user);
-		void	removeOper(Client* user);
 		void	setPassword(string password);
+		void	setTopic(string topic);
+		void	clearTopic();
+		void	removeOper(Client* user);
 		void	removePassword();
 		void	join(Client* user);
 		void	leave(Client* user);
@@ -41,7 +42,6 @@ class Channel
 
 		int		getMode(CHANNEL_OPT type) const;
 		void	setMode(CHANNEL_OPT type, int value);
-		// void	broadcast(string msg);
 
 
 		string	_getTimestamp() const;
