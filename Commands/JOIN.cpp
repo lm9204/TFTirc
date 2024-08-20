@@ -60,10 +60,10 @@ void JOIN::execute(Server& server, Client& client) {
 			continue;
 		}
 		channel->join(&client);
-		channel->send(":" + client.getNickName() + "!~" + client.getUserName() + "@" + client.getHostName() + " " + "JOIN" + " " + this->_cmdSource[1] + "\r\n");
-		channel->send(makeNumericMsg(server, client, *channel, RPL_TOPIC));
-		channel->send(makeNumericMsg(server, client, *channel, RPL_NAMREPLY));
-		channel->send(makeNumericMsg(server, client, *channel, RPL_ENDOFNAMES));
+		channel->broadcast(":" + client.getNickName() + "!~" + client.getUserName() + "@" + client.getHostName() + " " + "JOIN" + " " + this->_cmdSource[1] + "\r\n");
+		client.send(makeNumericMsg(server, client, *channel, RPL_TOPIC));
+		client.send(makeNumericMsg(server, client, *channel, RPL_NAMREPLY));
+		client.send(makeNumericMsg(server, client, *channel, RPL_ENDOFNAMES));
 	}
 	this->targetChannel.clear();
 	this->targetKey.clear();

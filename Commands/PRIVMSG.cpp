@@ -41,7 +41,7 @@ void PRIVMSG::execute(Server& server, Client& client) {
 			if (targetChannel == NULL) {
 				client.send(makeNumericMsg(server, client, this->_cmdSource[1], ERR_CANNOTSENDTOCHAN));
 			} else {
-				targetChannel->send(":" + client.getNickName() + "!~" + client.getUserName() + "@" + client.getHostName() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + " " + this->_cmdSource[2] + "\r\n", client);
+				targetChannel->broadcast(":" + client.getNickName() + "!~" + client.getUserName() + "@" + client.getHostName() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + " " + this->_cmdSource[2] + "\r\n", &client);
 			}
 		}
 	}
