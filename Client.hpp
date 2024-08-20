@@ -11,7 +11,7 @@ using namespace std;
 class Client
 {
 	public:
-		Client(int fd);
+		Client(int fd, string client_addr);
 		~Client();
 
 		vector<string>	split(string line, char delim);
@@ -20,9 +20,10 @@ class Client
 		int		send(const string& msg) const;
 
 		string	getNickName() const;
-		string	getHostName() const;
 		string	getUserName() const;
+		string	getHostName() const;
 		string	getRealName() const;
+  
 		string	getBuf() const;
 		int		getSocketFd() const;
 		string	getCommand();
@@ -32,8 +33,7 @@ class Client
 		void	setHostName(string host);
 		void	setRealName(string real);
 
-		string flushBuf();
-		void setBuf();
+		void	flushBuf();
 	private:
 		string	_nick;
 		string	_user;

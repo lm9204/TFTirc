@@ -32,38 +32,18 @@ void NICK::execute(Server& server, Client& client) {
 		client.send(makeNumericMsg(server, client, ERR_ERRONEUSNICKNAME));
 		return ;
 	}
-	// 중복 닉네임
-	try {
-		Client& getClient = server.getClient(this->_cmdSource[1]);
-		if (getClient.getSocketFd() != -1) {
-			client.send(makeNumericMsg(server, client, ERR_NICKNAMEINUSE));
-			return ;
-		}
-	} catch (exception& e) {
+	// 중복 닉네임 확인
+	Client* findClient = server.getClient(this->_cmdSource[1]);
+	if (findClient != NULL) {
+		client.send(makeNumericMsg(server, client, ERR_NICKNAMEINUSE));
+		return ;
 	}
-	// client.send(":" + client.getNickName() + "!" + client.getUserName() + "@" + server.getHostName() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
-	client.send(":" + client.getNickName() + "!" + "testa" + "@" + "testb" + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
+	client.send(":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
+	// client.send(":" + client.getNickName() + "!" + "testa" + "@" + "testb" + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
 	client.setNickName(this->_cmdSource[1]);
+	if (client.getUserName() != "" && client.getRealName() != "")
+		client.send(makeNumericMsg(server, client, RPL_WELCOME));
 }
-
-string NICK::makeNumericMsg(Server& server, Client& client, int num) {
-	stringstream ss;
-	string res = "";
-	ss << num;
-
-	static_cast<void>(server);
-	// res += ":" + server.getHostName() + " ";
-	res += string(":") + "server" + " " + ss.str() + " ";
-	if (num == ERR_NONICKNAMEGIVEN) {
-		res += client.getNickName() + " " + ":No nickname given" + "\r\n";
-	} else if (num == ERR_ERRONEUSNICKNAME) {
-		res += client.getNickName() + " " + this->_cmdSource[1] + " " + ":Erroneus nickname" + "\r\n";
-	} else if (num == ERR_NICKNAMEINUSE) {
-		res += client.getNickName() + " " + this->_cmdSource[1] + " " + ":Nickname is already in use" + "\r\n";
-	}
-	return res;
-}
-
 
 /*
 - 모든 영숫자 문자, 대괄호 및 중괄호([]{}), 백슬래시(\), 파이프(|) 문자를 허용

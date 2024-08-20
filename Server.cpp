@@ -2,7 +2,7 @@
 #include "Server.hpp"
 #include "Command.hpp"
 
-Server::Server(int port, string password) :  _command_controller(CommandController()),_err_client(Client(-1)), _err_channel("EMPTY"), _password(password), _port(port), _socket(-1)
+Server::Server(int port, string password) :  _command_controller(CommandController()), _password(password), _name(HOST), _port(port), _socket(-1)
 {
 	if ((_socket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
 		handle_error("socket error");
@@ -106,15 +106,15 @@ void	Server::disconnect_client(int client_fd, map<int, string>& clients)
 
 int		Server::bindClient()
 {
+	struct sockaddr_in	client_addr;
 	int so_client;
-	if ((so_client = accept(_socket, 0, 0)) == -1)
+	if ((so_client = accept(_socket, (struct sockaddr*)&client_addr, 0)) == -1)
 	{
 		cerr << "accept error\n";
 		return (0);
 	}
 	cout << "accept new client: " << so_client << "\n";
-	//setnick user
-	_clients.push_back(Client(so_client));
+	_clients.push_back(Client(so_client, static_cast<string>(inet_ntoa(client_addr.sin_addr))));
 	fcntl(so_client, F_SETFL, O_NONBLOCK);
 
 	change_events(_change_list, so_client, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
@@ -122,7 +122,7 @@ int		Server::bindClient()
 	return (1);
 }
 
-int	Server::createChannel(string ch_name, string owner)
+int	Server::createChannel(string ch_name, Client* owner)
 {
 	if (getChannel(ch_name)->getName() != "EMPTY")
 	{
@@ -139,6 +139,11 @@ int	Server::createChannel(string ch_name, string owner)
 string	Server::getPassword() const
 {
 	return _password;
+}
+
+string	Server::getServername() const
+{
+	return _name;
 }
 
 Client*	Server::getClient(int fd)

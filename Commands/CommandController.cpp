@@ -3,7 +3,7 @@
 #include "NICK.hpp"
 #include "USER.hpp"
 #include <sstream>
-
+#include <iostream>
 
 CommandController::CommandController() {
 	this->_commands["CAP"] = new CAP();
@@ -36,7 +36,7 @@ Command* CommandController::makeCommand(Client& client) {
 		return NULL;
 	vector<string> cmds = cmdSplit(cmd);
 	for (int i = 0; i < static_cast<int>(cmds.size()); i++)
-		std::cout << cmds[i] << std::endl;
+		cout << cmds[i] << std::endl;
 	if(_commands[cmds[0]] == NULL)
 		return NULL;
 	_commands[cmds[0]]->setCmdSource(cmds);
