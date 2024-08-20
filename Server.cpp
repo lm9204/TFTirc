@@ -125,7 +125,7 @@ int		Server::bindClient()
 
 int	Server::createChannel(string ch_name, Client* owner)
 {
-	if (getChannel(ch_name)->getName() != "EMPTY")
+	if (getChannel(ch_name) != NULL)
 	{
 		cout << "[ERROR] Channel " << ch_name << " is already exist.\n";
 		return (0);
