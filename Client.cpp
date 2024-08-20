@@ -40,12 +40,18 @@ string	Client::getHostName() const
 	return (_host);
 }
 
+string	Client::getUserName() const
+{
+	return (_user);
+}
+
 string	Client::getRealName() const
 {
 	return (_real);
 }
 
-string	Client::getBufName() const
+
+string	Client::getBuf() const
 {
 	return (_buf);
 }
