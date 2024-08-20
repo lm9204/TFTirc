@@ -2,6 +2,7 @@
 #include "CAP.hpp"
 #include "NICK.hpp"
 #include "USER.hpp"
+#include "PRIVMSG.hpp"
 #include <sstream>
 #include <iostream>
 
@@ -9,6 +10,7 @@ CommandController::CommandController() {
 	this->_commands["CAP"] = new CAP();
 	this->_commands["NICK"] = new NICK();
 	this->_commands["USER"] = new USER();
+	this->_commands["PRIVMSG"] = new PRIVMSG();
 }
 
 CommandController::~CommandController() {
