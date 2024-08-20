@@ -107,8 +107,9 @@ void	Server::disconnect_client(int client_fd, map<int, string>& clients)
 int		Server::bindClient()
 {
 	struct sockaddr_in	client_addr;
+	socklen_t			client_len = sizeof(client_addr);
 	int so_client;
-	if ((so_client = accept(_socket, (struct sockaddr*)&client_addr, 0)) == -1)
+	if ((so_client = accept(_socket, (struct sockaddr*)&client_addr, &client_len)) == -1)
 	{
 		cerr << "accept error\n";
 		return (0);
