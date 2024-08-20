@@ -3,6 +3,7 @@
 #include "NICK.hpp"
 #include "USER.hpp"
 #include "PRIVMSG.hpp"
+#include "JOIN.hpp"
 #include <sstream>
 #include <iostream>
 
@@ -11,6 +12,7 @@ CommandController::CommandController() {
 	this->_commands["NICK"] = new NICK();
 	this->_commands["USER"] = new USER();
 	this->_commands["PRIVMSG"] = new PRIVMSG();
+	this->_commands["JOIN"] = new JOIN();
 }
 
 CommandController::~CommandController() {
