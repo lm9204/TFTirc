@@ -38,7 +38,6 @@ void	MODE::do_command(Server& server, Client& client, std::string name)
 		else
 			server.getChannel(name)->setMode(Channel::USER_LIMIT, 1000000000); //-> 조건 없으면 뭐지
 	}
-	//:<server_name> MODE <channel/user> <mode> <params>
 }
 
 int		MODE::check_client_oper(vector<Client*> cli_list, Client client)
@@ -123,14 +122,13 @@ void	MODE::execute(Server& server, Client& client)
 			_mode = FLAG_O;
 		else
 		{
-			client.send(":" + client.getHostName() + " 472 " + client.getNickName() + _cmdSource[cmd_idx] + " :is unknown mode char to me\r\n");
+			client.send(":" + client.getHostName() + " 472 " + client.getNickName() + opt + " :is unknown mode char to me\r\n");
 			break;
 		}
 		if (_flag != -1)
 		{
 			do_command(server, client, name);
-			client.send(":" + client.getHostName() + " MODE " + (server.getChannel(name))->getName() + (_flag == '+' ? "+" : "-") + _cmdSource[cmd_idx] + client.getNickName() + "\r\n");
-			//:<server_name> MODE <channel/user> <mode> <params>
+			client.send(":" + client.getHostName() + " MODE " + (server.getChannel(name))->getName() + (_flag == '+' ? "+" : "-") + opt + client.getNickName() + "\r\n");
 		}
 		op_idx++;
 	}
@@ -143,63 +141,3 @@ void	MODE::execute(Server& server, Client& client)
 	-iiioi+oo -> 모드 옵션
 	*/
 	// 이런 형식으로 들어오게 된다.
-
-
-
-
-
-	//name = _cmdSource[1];
-	//while ()
-	//get_command()
-	//if (flag_i && flag_plus)
-	//{
-	//	server.getChannel(name)->setMode(Channel::INVITE_ONLY, true);
-	//}
-	//else if (flag_i && flag_minus)
-	//{
-	//	server.getChannel(name)->setMode(Channel::INVITE_ONLY, true);
-	//}
-	//else if (flag_t && flag_plus)
-	//{
-	//	server.getChannel(name)->setMode(Channel::TOPIC_OPER_ONLY, true);
-	//}
-	//else if (flag_t && flag_minus)
-	//{
-	//	server.getChannel(name)->setMode(Channel::TOPIC_OPER_ONLY, false);
-	//}
-	//else if (flag_l && flag_plus)
-	//{
-	//	server.getChannel(name)->setMode(Channel::USER_LIMIT, true);
-	//}
-	//else if (flag_l && flag_minus)
-	//{
-	//	server.getChannel(name)->setMode(Channel::USER_LIMIT, false);
-	//}
-	//else if (flag_k && flag_plus)
-	//{
-	//	server.getChannel(name)->setPassword(password);
-	//}
-	//else if (flag_k && flag_minus)
-	//{
-	//	server.getChannel(name)->removePassword();
-	//}
-	//else if (flag_o && flag_plus)
-	//{
-	//	server.getChannel(name)->setMode(Channel::INVITE_ONLY, true);
-	//}
-	//else if (flag_o && flag_minus)
-	//{
-	//	server.getChannel(name)->setMode(Channel::INVITE_ONLY, true);
-	//}
-	//else
-	//{
-		/*
-		:<server_name> 461 <nickname> MODE :Not enough parameters
-		:<server_name> 472 <nickname> <modechar> :is unknown mode char to me
-		:<server_name> 482 <nickname> <channel> :You're not channel operator
-		:<server_name> 441 <nickname> <channel> <user> :They aren't on that channel
-		:<server_name> 403 <nickname> <channel> :No such channel
-		*/
-	//	return;
-	//}
-	//:<server_name> MODE <channel/user> <mode> <params>
