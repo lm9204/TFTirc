@@ -15,6 +15,8 @@
 
 
 # define MAX_USER 512
+# define HOST "TFTirc"
+
 class CommandController;
 
 using namespace std;
@@ -29,10 +31,11 @@ class Server
 		void	disconnect_client(int client_fd, map<int, string>& clients);
 
 		int		bindClient();
-		int		createChannel(string ch_name, string owner);
+		int		createChannel(string ch_name, Client* owner);
 
 		void	deleteChannel(string ch_name); // *
 		string	getPassword() const; // *
+		string	getServername() const;
 		
 		Client*		getClient(int fd);
 		Client*		getClient(string nick);
@@ -44,9 +47,8 @@ class Server
 		CommandController		_command_controller;
 		vector<Channel> _channels;
 		vector<Client>	_clients;
-		Client	_err_client;
-		Channel	_err_channel;
 		string	_password;
+		string	_name;
 		int		_port;
 		
 		vector<struct kevent>	_change_list;

@@ -14,6 +14,7 @@ class CommandController {
 		Command* makeCommand(Client& parser);
 	private:
 		std::map<string, Command*> _commands;
+		vector<string> cmdSplit(string cmd);
 };
 
 #endif

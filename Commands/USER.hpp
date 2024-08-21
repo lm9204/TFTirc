@@ -5,9 +5,7 @@
 # include "Server.hpp"
 # include "Client.hpp"
 
-# define RPL_WELCOME "001"
-# define ERR_NEEDMOREPARAMS "461"
-# define ERR_ALREADYREGISTERED "462"
+
 
 class USER: public Command {
 	public:
@@ -16,8 +14,6 @@ class USER: public Command {
 		USER& operator=(const USER& other);
 		virtual ~USER();
 		virtual void execute(Server& server, Client& parser);
-	private:
-		string makeNumericMsg(Server& server, Client& client, const char *num);
 };
 
 #endif
