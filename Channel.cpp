@@ -68,6 +68,25 @@ void	Channel::setOper(Client* user)
 }
 
 /* need oper */
+void	Channel::setPassword(string password)
+{
+	this->_password = password;
+	cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Password Successfully changed to " << password << ".\n";
+}
+
+void	Channel::setTopic(string topic)
+{
+	this->_topic = topic;
+	cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Channel topic changed to " << topic << ".\n";
+}
+
+void	Channel::clearTopic()
+{
+	this->_topic = "";
+	cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Channel topic cleared.\n";
+}
+
+/* need oper */
 void	Channel::removeOper(Client* user)
 {
 	int idx;
@@ -78,13 +97,6 @@ void	Channel::removeOper(Client* user)
 		_operators.erase(_operators.begin() + idx);
 		cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] The operator has been removed from the " << user->getNickName() << ".\n"; 
 	}
-}
-
-/* need oper */
-void	Channel::setPassword(string password)
-{
-	this->_password = password;
-	cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Password Successfully changed to " << password << ".\n";
 }
 
 /* need oper */
@@ -132,11 +144,23 @@ void	Channel::kick(Client* user)
 	}
 }
 
-void	Channel::setTopic(string topic)
+void	Channel::broadcast(string msg)
 {
-	this->_topic = topic;
-	cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Channel topic changed to " << topic << ".\n";
+	for (vector<Client*>::const_iterator it = _users.begin(); it != _users.end(); ++it)
+	{
+		(*it)->send(msg);
+	}
 }
+
+void	Channel::broadcast(string msg, Client* except_client)
+{
+	for (vector<Client*>::const_iterator it = _users.begin(); it != _users.end(); ++it)
+	{
+		if (except_client != *it)
+			(*it)->send(msg);
+	}
+}
+
 
 int	Channel::getMode(CHANNEL_OPT type) const
 {
@@ -174,12 +198,6 @@ void	Channel::setMode(CHANNEL_OPT type, int value)
 			break;
 	}
 }
-
-// 각 클라이언트들에게 send가 불가능
-// void	Channel::broadcast(string msg)
-// {
-
-// }
 
 
 /** @brief Get index if a nickname exists in the group.

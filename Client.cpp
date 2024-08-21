@@ -3,20 +3,10 @@
 
 #include "Client.hpp"
 
-Client::Client(int fd) : _fd(fd)
+Client::Client(int fd, string client_addr) : _nick("*"), _host(client_addr), _fd(fd)
 {
 	cout << "new client connect. user: " << _nick << "socket: " << _fd << "\n";
 }
-
-// Client::Client(string nick, string names, int fd) : _nick(nick), _fd(fd)
-// {
-// 	vector<string> split_names = split(names, ' ');
-// 	// if (names.size() != 4) //handle_error
-// 	_user = split_names[0];
-// 	_host = split_names[1];
-// 	_real = split_names[2];
-// 	cout << "new client connect. user: " << _nick << "socket: " << _fd << "\n";
-// }
 
 Client::~Client()
 {
@@ -26,13 +16,18 @@ Client::~Client()
 string	Client::who() const
 {
 	if (_nick.length() != 0 && _host.length() != 0)
-		return (_nick + "!" + _nick + "@" + _host);
+		return (_nick + "!" + _user + "@" + _host);
 	return (NULL);
 }
 
 string	Client::getNickName() const
 {
 	return (_nick);
+}
+
+string Client::getUserName() const
+{
+	return (_user);
 }
 
 string	Client::getHostName() const
@@ -45,7 +40,7 @@ string	Client::getRealName() const
 	return (_real);
 }
 
-string	Client::getBufName() const
+string	Client::getBuf() const
 {
 	return (_buf);
 }
@@ -68,7 +63,6 @@ string	Client::getCommand()
 
 void		Client::setNickName(string nick)
 {
-	//중복 체크
 	_nick = nick;
 }
 
@@ -117,7 +111,6 @@ int		Client::recv()
 int		Client::send(const string& msg) const
 {
 	int n;
-	// valid fd
 	if ((n = write(_fd, msg.c_str(), msg.size())) == -1)
 	{
 		cerr << "client write error\n";
@@ -139,12 +132,7 @@ vector<string>	Client::split(string line, char delim)
 	return (res);
 }
 
-string Client::flushBuf() {
-	string s = this->_buf;
-	this->_buf = "";
-	return s;
-}
-
-void Client::setBuf() {
+void Client::flushBuf()
+{
 	this->_buf.clear();
 }
