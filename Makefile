@@ -13,7 +13,8 @@ SRCS =	main.cpp \
 		Commands/USER.cpp \
 		Commands/PRIVMSG.cpp \
 		Commands/JOIN.cpp \
-		Commands/CAP.cpp 
+		Commands/CAP.cpp \
+		Commands/MODE.cpp 
 
 OBJS = $(SRCS:.cpp=.o)
 NAME = ircserv

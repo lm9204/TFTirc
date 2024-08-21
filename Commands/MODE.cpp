@@ -24,14 +24,14 @@ void	MODE::do_command(Server& server, Client& client, std::string name)
 		else if (_flag == '-')
 			server.getChannel(name)->removeOper(&client);
 	}
-	else if (_mode = FLAG_K)
+	else if (_mode == FLAG_K)
 	{
 		if (_flag == '+')
 			server.getChannel(name)->setPassword(_key);
 		else if (_flag == '-')
 			server.getChannel(name)->removePassword();
 	}
-	else if (_mode = FLAG_L) // channel setmode limit should false change
+	else if (_mode == FLAG_L) // channel setmode limit should false change
 	{
 		if (_flag == '+')
 			server.getChannel(name)->setMode(Channel::USER_LIMIT, _limit);
@@ -42,7 +42,8 @@ void	MODE::do_command(Server& server, Client& client, std::string name)
 
 int		MODE::check_client_oper(vector<Client*> cli_list, Client client)
 {
-	for (int idx = 0; idx < cli_list.size(); idx++)
+	int len = cli_list.size();
+	for (int idx = 0; idx < len; idx++)
 	{
 		if (cli_list[idx]->getNickName() == client.getNickName())
 			return (1);
@@ -58,13 +59,12 @@ void	MODE::execute(Server& server, Client& client)
 	std::stringstream ss;
 	int		op_idx = 0;
 	int		cmd_idx = 3;
-	int		mode;
-	int		flag = -1;
 	int		limit;
 	char	opt;
 
 	name = _cmdSource[1];
 	option = _cmdSource[2];
+	_flag = -1;
 	if (_cmdSource.size() < 3)
 	{
 		client.send(":" + client.getHostName() + " 461 " + client.getNickName() + " :Not enough parameters\r\n");
@@ -94,7 +94,7 @@ void	MODE::execute(Server& server, Client& client)
 		else if (opt == 'l')
 		{
 			_mode = FLAG_L;
-			if (cmd_idx < _cmdSource.size())
+			if (cmd_idx < static_cast<int>(_cmdSource.size()))
 			{
 				ss << _cmdSource[cmd_idx];
 				ss >> limit;
@@ -109,7 +109,7 @@ void	MODE::execute(Server& server, Client& client)
 		else if (opt == 'k')
 		{
 			_mode = FLAG_K;
-			if (cmd_idx < _cmdSource.size())
+			if (cmd_idx < static_cast<int>(_cmdSource.size()))
 				key = _cmdSource[cmd_idx];
 			else
 			{
