@@ -29,5 +29,5 @@ void	PASS::execute(Server& server, Client& client)
 		server.disconnect_client(client.getSocketFd());
 		return ;
 	}
-	client.send("PASS: AUTHENTICATE");
+	//client.send("PASS: AUTHENTICATE"); -> 필요없음
 }

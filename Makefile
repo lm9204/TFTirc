@@ -15,7 +15,12 @@ SRCS =	main.cpp \
 		Commands/JOIN.cpp \
 		Commands/CAP.cpp \
 		Commands/UNKNOWN.cpp \
-		Commands/MODE.cpp 
+		Commands/MODE.cpp \
+		Commands/PASS.cpp \
+		Commands/TOPIC.cpp \
+		Commands/KICK.cpp \
+		Commands/INVITE.cpp \
+		Commands/PART.cpp 
 
 OBJS = $(SRCS:.cpp=.o)
 NAME = ircserv

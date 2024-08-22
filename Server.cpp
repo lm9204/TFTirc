@@ -104,7 +104,7 @@ void	Server::disconnect_client(int client_fd)
 	close(client_fd);
 	for (size_t i = 0; i < _clients.size(); ++i)
 	{
-		if (_clients[i].getSocketFd() == client_fd);
+		if (_clients[i].getSocketFd() == client_fd)
 		{
 			for (size_t j = 0; j < _channels.size(); ++j)
 			{
