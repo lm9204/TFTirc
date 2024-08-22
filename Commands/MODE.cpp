@@ -136,7 +136,8 @@ void	MODE::execute(Server& server, Client& client)
 			_mode = FLAG_O;
 		else
 		{
-			client.send(makeNumericMsg(server, client, opt, "472"));
+			name = opt;
+			client.send(makeNumericMsg(server, client, name, "472"));
 			//client.send(":" + client.getHostName() + " 472 " + client.getNickName() + opt + " :is unknown mode char to me\r\n");
 			break;
 		}
