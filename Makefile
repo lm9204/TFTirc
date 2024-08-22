@@ -14,6 +14,7 @@ SRCS =	main.cpp \
 		Commands/PRIVMSG.cpp \
 		Commands/JOIN.cpp \
 		Commands/CAP.cpp \
+		Commands/UNKNOWN.cpp \
 		Commands/MODE.cpp 
 
 OBJS = $(SRCS:.cpp=.o)
