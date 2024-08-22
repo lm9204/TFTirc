@@ -44,6 +44,8 @@ const string Command::makeNumericMsg(Server& server, Client& client, const strin
 		res += client.getNickName() + " " + ":You may not reregister";
 	} else if (num == ERR_NOTREGISTERED) {
 		res += client.getNickName() + " " + ":You have not registered";
+	} else if (num == ERR_UNKNOWNCOMMAND) {
+		res += client.getNickName() + " " + this->_cmdSource[0] + " " + ":Unknown command";
 	} else {
 		return "";
 	}
@@ -62,6 +64,10 @@ const string Command::makeNumericMsg(Server& server, Client& client, const strin
 		res += client.getNickName() + " " + name + " " + ":Cannot send to channel";
 	} else if (num == ERR_NOSUCHCHANNEL) {
 		res += client.getNickName() + " " + name + " " + ":No such channel";
+	} else if (num == ERR_CHANOPRIVSNEEDED) {
+		res += client.getNickName() + " " + name + " " + ":You're not channel operator";
+	} else if (num == ERR_UNKNOWNMODE) {
+		res += client.getNickName() + " " + name + " " + ":is unknown mode char to me";
 	} else if (num == ERR_BADCHANMASK) {
 		res += name + " " + ":Bad Channel Mask";
 	} else {

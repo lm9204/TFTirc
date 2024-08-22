@@ -4,6 +4,8 @@
 #include "USER.hpp"
 #include "PRIVMSG.hpp"
 #include "JOIN.hpp"
+#include "MODE.hpp"
+#include "UNKNOWN.hpp"
 #include <sstream>
 #include <iostream>
 
@@ -13,6 +15,8 @@ CommandController::CommandController() {
 	this->_commands["USER"] = new USER();
 	this->_commands["PRIVMSG"] = new PRIVMSG();
 	this->_commands["JOIN"] = new JOIN();
+	this->_commands["MODE"] = new MODE();
+	this->_commands["UNKNOWN"] = new UNKNOWN();
 }
 
 CommandController::~CommandController() {
@@ -55,7 +59,7 @@ Command* CommandController::makeCommand(Client& client) {
 	// for (int i = 0; i < static_cast<int>(cmds.size()); i++)
 	// 	cout << "[" << i << "]: " << cmds[i] << std::endl;
 	if(_commands[cmds[0]] == NULL)
-		return NULL;
+		cmds[0] = "UNKNOWN";
 	_commands[cmds[0]]->setCmdSource(cmds);
 	return this->_commands[cmds[0]];
 }

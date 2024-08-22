@@ -54,7 +54,7 @@ void JOIN::execute(Server& server, Client& client) {
 			continue;
 		}
 		// 초대 전용 모드이고 초대되지 않았을 경우
-		if (channel->getMode(Channel::INVITE_ONLY) && !channel->isInvited()) {
+		if (channel->getMode(Channel::INVITE_ONLY) && !channel->isInvited(client.getNickName())) {
 				client.send(makeNumericMsg(server, client, *channel, ERR_INVITEONLYCHAN));
 			continue;
 		}
