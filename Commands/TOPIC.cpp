@@ -8,7 +8,7 @@ void	TOPIC::execute(Server& server, Client& client)
 {
 	string msg;
 	Channel* ch = server.getChannel(_cmdSource[1]);
-	if (ch->getMode(ch->TOPIC_OPER_ONLY) && ch->isOper(&client))
+	if ((ch->getMode(ch->TOPIC_OPER_ONLY) && ch->isOper(&client)) || !ch->getMode(ch->TOPIC_OPER_ONLY))
 	{
 		if (_cmdSource.size() == 2)
 			msg = ch->getName() + " topic is " + ch->getTopic() + ".\r\n"; 
