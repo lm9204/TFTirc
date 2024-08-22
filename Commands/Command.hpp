@@ -22,6 +22,7 @@
 # define RPL_ENDOFNAMES				"366"
 # define ERR_NOTREGISTERED			"451"
 # define ERR_CHANOPRIVSNEEDED		"482"
+# define ERR_UNKNOWNCOMMAND			"421"
 
 using namespace std;
 

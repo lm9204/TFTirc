@@ -44,6 +44,8 @@ const string Command::makeNumericMsg(Server& server, Client& client, const strin
 		res += client.getNickName() + " " + ":You may not reregister";
 	} else if (num == ERR_NOTREGISTERED) {
 		res += client.getNickName() + " " + ":You have not registered";
+	} else if (num == ERR_UNKNOWNCOMMAND) {
+		res += client.getNickName() + " " + this->_cmdSource[0] + " " + ":Unknown command";
 	} else {
 		return "";
 	}
