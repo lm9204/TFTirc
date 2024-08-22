@@ -141,7 +141,7 @@ void	Server::notify(string nick, string msg)
 	for (size_t i = 0; i < _channels.size(); ++i)
 	{
 		if (_channels[i].checkUserInChannel(nick))
-			_channels[i].broadcast(msg);
+			_channels[i].broadcast(msg, getClient(nick));
 	}
 }
 
