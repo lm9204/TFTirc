@@ -56,6 +56,8 @@ Command* CommandController::makeCommand(Client& client) {
 	if (cmd == "no_comand")
 		return NULL;
 	vector<string> cmds = cmdSplit(cmd);
+	if (cmds.empty())
+		return NULL;
 	// for (int i = 0; i < static_cast<int>(cmds.size()); i++)
 	// 	cout << "[" << i << "]: " << cmds[i] << std::endl;
 	Command* command = this->_commands[cmds[0]];
