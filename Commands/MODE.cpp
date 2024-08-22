@@ -1,5 +1,5 @@
 #include "MODE.hpp"
-
+#include <iostream>
 MODE::MODE(): Command() {}
 MODE::MODE(const MODE& other): Command(other) {}
 MODE::~MODE() {}
@@ -51,6 +51,11 @@ int		MODE::check_client_oper(vector<Client*> cli_list, Client client)
 	return (0);
 }
 
+//void	MODE::userMode(Server& server, Client& client)
+//{
+//	client.send(":" + client.getHostName() + " 221 " + client.getNickName() + _cmdSource[2] + "\r\n");
+//}
+
 void	MODE::execute(Server& server, Client& client)
 {
 	string	name;
@@ -62,6 +67,11 @@ void	MODE::execute(Server& server, Client& client)
 	int		limit;
 	char	opt;
 
+	if (_cmdSource[1][0] != '#')
+	{
+		client.send(":" + client.getHostName() + " 221 " + client.getNickName() + _cmdSource[2] + "\r\n");
+		return ;
+	}
 	name = _cmdSource[1];
 	option = _cmdSource[2];
 	_flag = -1;
@@ -129,6 +139,7 @@ void	MODE::execute(Server& server, Client& client)
 		{
 			do_command(server, client, name);
 			client.send(":" + client.getHostName() + " MODE " + (server.getChannel(name))->getName() + (_flag == '+' ? "+" : "-") + opt + client.getNickName() + "\r\n");
+			std::cout<<":" + client.getHostName() + " MODE " + (server.getChannel(name))->getName() + (_flag == '+' ? "+" : "-") + opt + client.getNickName() + "\r\n";
 		}
 		op_idx++;
 	}

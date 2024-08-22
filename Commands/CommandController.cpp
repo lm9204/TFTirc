@@ -4,6 +4,8 @@
 #include "USER.hpp"
 #include "PRIVMSG.hpp"
 #include "JOIN.hpp"
+#include "MODE.hpp"
+//#include "TOPIC.hpp"
 #include <sstream>
 #include <iostream>
 
@@ -13,6 +15,8 @@ CommandController::CommandController() {
 	this->_commands["USER"] = new USER();
 	this->_commands["PRIVMSG"] = new PRIVMSG();
 	this->_commands["JOIN"] = new JOIN();
+	this->_commands["MODE"] = new MODE();
+	//this->_commands["TOPIC"] = new TOPIC();
 }
 
 CommandController::~CommandController() {
