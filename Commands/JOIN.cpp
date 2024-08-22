@@ -59,7 +59,7 @@ void JOIN::execute(Server& server, Client& client) {
 			continue;
 		}
 		// 유저 제한이 존재하고 제한을 넘겼을 경우
-		if (channel->getMode(Channel::USER_LIMIT) != -1 && channel->getMode(Channel::USER_LIMIT) <= static_cast<int>(channel->getUsers().size())) {
+		if (channel->getMode(Channel::USER_LIMIT) != 0 && channel->getMode(Channel::USER_LIMIT) <= static_cast<int>(channel->getUsers().size())) {
 			client.send(makeNumericMsg(server, client, *channel, ERR_CHANNELISFULL));
 			continue;
 		}
