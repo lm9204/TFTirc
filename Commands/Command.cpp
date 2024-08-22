@@ -94,10 +94,16 @@ const string Command::makeNumericMsg(Server& server, Client& client, Channel& ch
 		res += client.getNickName() + " " + channel.getName() + " " + ":" + channel.getTopic();
 	} else if (num == RPL_NAMREPLY) {
 		vector<Client*> clients = channel.getUsers();
-		res += client.getNickName() + " " + "=" + " " + channel.getName() + " " + ":" + client.getNickName();
-		for (vector<Client*>::iterator it = clients.begin(); it != clients.end(); it++)
-			if (client.getNickName() != (*it)->getNickName())
-				res += " " + (*it)->getNickName();
+		res += client.getNickName() + " " + "=" + " " + channel.getName() + " " + ":";
+		for (vector<Client*>::iterator it = clients.begin(); it != clients.end(); it++) {
+			if (channel.isOper(*it)) {
+				res += "@" + (*it)->getNickName();
+			} else {
+				res += (*it)->getNickName();
+			}
+			if (it + 1 != clients.end())
+				res += " ";
+		}
 	} else if (num == RPL_ENDOFNAMES) {
 		res += client.getNickName() + " " + channel.getName() + " " + ":End of /NAMES list";
 	} else {
