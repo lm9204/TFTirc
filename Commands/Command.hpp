@@ -39,10 +39,11 @@ class Command {
 		virtual ~Command();
 		virtual void execute(Server& server, Client& client) = 0;
 		void setCmdSource(vector<string>& cmdSource);
+	protected:
+		int checkNotRegisterClient(Server& server, Client& client);
 		const string makeNumericMsg(Server& server, Client& client, const string& num);
 		const string makeNumericMsg(Server& server, Client& client, const string& name, const string& num);
 		const string makeNumericMsg(Server& server, Client& client, Channel& channel, const string& num);
-	protected:
 		vector<string> _cmdSource;
 };
 
