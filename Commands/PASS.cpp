@@ -19,11 +19,20 @@ void	PASS::execute(Server& server, Client& client)
 {
 	//:dan-!d@localhost QUIT :Quit: Bye for now!
 	if (client.getNickName() != "*")
-		client.send(":" + client.getHostName() + " 462 " + client.getNickName() + " :You may not reregister\r\n");
-	else if (server.getPassword() == _cmdSource[1])
-		client.send("PASS: AUTHENTICATE\r\n");
-	else if (sizeof(_cmdSource))
-		client.send(":" + client.getHostName() + " 461 * PASS :Not enough parameters\r\n");
-	else
-		client.send(":" + client.getHostName() + " 464 * :PASSword incorrect\r\n");
+	{
+		client.send(makeNumericMsg(server, client, "462"));
+		return ;
+	}
+	if (_cmdSource.size() < 2)
+	{
+		client.send(makeNumericMsg(server, client, "461"));
+		return ;
+	}
+	if (server.getPassword() != _cmdSource[1])
+	{
+		client.send(makeNumericMsg(server, client, "464"));
+		//break client;
+		return ;
+	}
+	client.send("PASS: AUTHENTICATE");
 }
