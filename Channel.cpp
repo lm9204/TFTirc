@@ -2,7 +2,7 @@
 #include <chrono>
 #include <iomanip>
 #include <sstream>
-
+#include "MODE.hpp"
 #include "Channel.hpp"
 
 Channel::Channel(string empty) : _name(empty)
@@ -216,11 +216,11 @@ void	Channel::setMode(CHANNEL_OPT type, int value)
 	{
 		case INVITE_ONLY:
 			_inviteOnly = value;
-			cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Channel INVITE_ONLY option changed to " << (value ? "true" : "false") << ".\n";
+			cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Channel INVITE_ONLY option changed to " << ((value == MODE::FLAG_PLUS) ? "true" : "false") << ".\n";
 			break;
 		case TOPIC_OPER_ONLY:
 			_topicOpOnly = value;
-			cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Channel TOPIC_OPER_ONLY option changed to " << (value ? "true" : "false") << ".\n";
+			cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Channel TOPIC_OPER_ONLY option changed to " << ((value == MODE::FLAG_PLUS) ? "true" : "false") << ".\n";
 			break;
 		case USER_LIMIT:
 			_user_limit = value;

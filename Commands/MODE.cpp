@@ -1,5 +1,6 @@
 #include "MODE.hpp"
 #include <iostream>
+
 MODE::MODE(): Command() {}
 MODE::MODE(const MODE& other): Command(other) {}
 MODE::~MODE() {}
@@ -11,7 +12,7 @@ MODE& MODE::operator=(const MODE& other) {
 	return *this;
 }
 
-void	MODE::do_command(Server& server, Client& client, std::string name)
+void	MODE::do_command(Server& server, std::string name)
 {
 	if (_mode == FLAG_I)
 		server.getChannel(name)->setMode(Channel::INVITE_ONLY, _flag);
@@ -19,21 +20,21 @@ void	MODE::do_command(Server& server, Client& client, std::string name)
 		server.getChannel(name)->setMode(Channel::TOPIC_OPER_ONLY, _flag);
 	else if (_mode == FLAG_O)
 	{
-		if (_flag == '+')
-			server.getChannel(name)->setOper(&client);
-		else if (_flag == '-')
-			server.getChannel(name)->removeOper(&client);
+		if (_flag == FLAG_PLUS)
+			server.getChannel(name)->setOper(server.getClient(_key));
+		else
+			server.getChannel(name)->removeOper(server.getClient(_key));
 	}
 	else if (_mode == FLAG_K)
 	{
-		if (_flag == '+')
+		if (_flag == FLAG_PLUS)
 			server.getChannel(name)->setPassword(_key);
-		else if (_flag == '-')
+		else
 			server.getChannel(name)->removePassword();
 	}
 	else if (_mode == FLAG_L)
 	{
-		if (_flag == '+')
+		if (_flag == FLAG_PLUS)
 			server.getChannel(name)->setMode(Channel::USER_LIMIT, _limit);
 		else
 			server.getChannel(name)->setMode(Channel::USER_LIMIT, -1);
@@ -51,16 +52,60 @@ int		MODE::check_client_oper(vector<Client*> cli_list, Client client)
 	return (0);
 }
 
+int	MODE::check_cmd(Server& server, Channel	&channel, Client& client)
+{
+	Client *temp;
+
+	if (_mode == FLAG_I)
+	{
+		if (_flag == FLAG_PLUS && channel.getMode(Channel::INVITE_ONLY) == FLAG_PLUS)
+			return (false);
+		if (_flag == FLAG_MINUS && channel.getMode(Channel::INVITE_ONLY) == FLAG_MINUS)
+			return (false);
+	}
+	if (_mode == FLAG_T)
+	{
+		if (_flag == FLAG_PLUS && channel.getMode(Channel::TOPIC_OPER_ONLY) == FLAG_PLUS)
+			return (false);
+		if (_flag == FLAG_MINUS && channel.getMode(Channel::TOPIC_OPER_ONLY) == FLAG_MINUS)
+			return (false);
+	}
+	if (_mode == FLAG_L)
+	{
+		if (_flag == FLAG_MINUS && channel.getMode(Channel::USER_LIMIT) == -1)
+			return (false);
+	}
+	if (_mode == FLAG_K)
+	{
+		if (_flag == FLAG_MINUS && channel.getPassword() == "") //key 없을 때 기본값 뭐지
+			return (false);
+	}
+	if (_mode == FLAG_O)
+	{
+		temp = server.getClient(_key);
+		if (temp == NULL)
+		{
+			client.send(makeNumericMsg(server, client, "401"));
+			return (false);
+		}
+		if (_flag == FLAG_PLUS && channel.isOper(temp) == true)
+			return (false);
+		if (_flag == FLAG_MINUS && channel.isOper(temp) == false)
+			return (false);
+	}
+	return (true);
+}
+
 void	MODE::execute(Server& server, Client& client)
 {
 	string	name;
 	string	option;
 	string	key;
+	string	respond = "";
+	string	respond_arg = "";
 	std::stringstream ss;
 	Channel	*channel;
-	int		op_idx = 0;
 	int		cmd_idx = 3;
-	int		limit;
 	char	opt;
 
 	if (_cmdSource[1][0] != '#')
@@ -71,7 +116,7 @@ void	MODE::execute(Server& server, Client& client)
 	name = _cmdSource[1];
 	option = _cmdSource[2];
 	_flag = -1;
-	channel = server.getChannel(name); 
+	channel = server.getChannel(name);
 	if (channel == NULL)
 	{
 		client.send(makeNumericMsg(server, client, "403", name));
@@ -80,73 +125,101 @@ void	MODE::execute(Server& server, Client& client)
 	if (_cmdSource.size() < 3)
 	{
 		client.send(makeNumericMsg(server, client, "461"));
-		//client.send(":" + client.getHostName() + " 461 " + client.getNickName() + " :Not enough parameters\r\n");
 		return;
 	}
 	if (check_client_oper(channel->getOper(), client)!= 1)
 	{
 		client.send(makeNumericMsg(server, client, channel->getName(), "482"));
-		//client.send(":" + client.getHostName() + " 482 " + client.getNickName() + channel->getName() + " :You're not channel operator\r\n");
 		return;
 	}
-	while (option[op_idx] != '\0')
+	for (int op_idx = 0; op_idx < static_cast<int>(option.size()); op_idx++)
 	{
 		opt = option[op_idx];
 		if (opt == '+')
-			_flag = FLAG_PLUS;
-		else if (opt == '-')
-			_flag = FLAG_MINUS;
-		if (opt == '+' || opt == '-')
 		{
-			op_idx++;
+			_flag = FLAG_PLUS;
+			if (respond != "" && (respond[respond.size() - 1] == '+' || respond[respond.size() - 1] == '-'))
+				respond = respond.substr(0, respond.size() - 1);
+			respond += opt;
+			continue;
+		}
+		else if (opt == '-')
+		{
+			_flag = FLAG_MINUS;
+			if (respond != "" && (respond[respond.size() - 1] == '+' || respond[respond.size() - 1] == '-'))
+				respond = respond.substr(0, respond.size() - 1);
+			respond += opt;
 			continue;
 		}
 		if (opt == 'i')
+		{
 			_mode = FLAG_I;
+		}
 		else if (opt == 't')
 			_mode = FLAG_T;
 		else if (opt == 'l')
 		{
 			_mode = FLAG_L;
-			if (cmd_idx < static_cast<int>(_cmdSource.size()))
+			if (_flag == FLAG_PLUS)
 			{
-				ss << _cmdSource[cmd_idx];
-				ss >> limit;
+				if (cmd_idx < static_cast<int>(_cmdSource.size()))
+				{
+					ss << _cmdSource[cmd_idx];
+					ss >> _limit;
+				}
+				else
+					continue;
+				cmd_idx++;
 			}
-			else
-			{
-				op_idx++;
-				continue;
-			}
-			cmd_idx++;
 		}
 		else if (opt == 'k')
 		{
 			_mode = FLAG_K;
-			if (cmd_idx < static_cast<int>(_cmdSource.size()))
-				key = _cmdSource[cmd_idx];
-			else
+			if (_flag == FLAG_PLUS)
 			{
-				op_idx++;
-				continue;
+				if (cmd_idx < static_cast<int>(_cmdSource.size()))
+					_key = _cmdSource[cmd_idx];
+				else
+					continue;
+				cmd_idx++;
 			}
-			cmd_idx++;
 		}
 		else if (opt == 'o')
+		{
 			_mode = FLAG_O;
+			if (_flag == FLAG_PLUS)
+			{
+				if (cmd_idx < static_cast<int>(_cmdSource.size()))
+					_key = _cmdSource[cmd_idx];
+				else
+					continue;
+				cmd_idx++;
+			}
+		}
 		else
 		{
 			name = opt;
 			client.send(makeNumericMsg(server, client, name, "472"));
-			//client.send(":" + client.getHostName() + " 472 " + client.getNickName() + opt + " :is unknown mode char to me\r\n");
 			break;
 		}
-		if (_flag != -1)
+		if (_flag != -1 && check_cmd(server, *channel, client) == true)
 		{
-			do_command(server, client, name);
-			client.send(":" + client.getHostName() + " MODE " + channel->getName() + (_flag == FLAG_PLUS ? "+" : "-") + opt + client.getNickName() + "\r\n");
+			respond += opt;
+			do_command(server, name);
+			if ((_mode == FLAG_K && _flag == FLAG_PLUS) ||(_mode == FLAG_L && _flag == FLAG_PLUS))
+			{
+				if (respond_arg != "")
+					respond_arg += " ";
+				respond_arg += _cmdSource[cmd_idx - 1];
+			}
 		}
-		op_idx++;
+	}
+	if (respond.size() > 1)
+	{
+		if (respond_arg != "")
+			client.send(string(":") + client.getNickName() + "!~" +client.getUserName() + "@" + client.getHostName() + " MODE " + channel->getName() + " " + respond + " " + respond_arg + "\r\n");
+		else
+			client.send(string(":") + client.getNickName() + "!~" +client.getUserName() + "@" + client.getHostName() + " MODE " + channel->getName() + " " + respond + "\r\n");
 	}
 }
 	//:<server_name> MODE <channel/user> <mode> <params>

@@ -3,7 +3,11 @@
 # include "Server.hpp"
 
 # define RPL_WELCOME				"001"
+# define RPL_TOPIC					"332"
+# define RPL_NAMREPLY				"353"
+# define RPL_ENDOFNAMES				"366"
 # define ERR_NOSUCHNICK				"401"
+# define ERR_NOSUCHCHANNEL			"403"
 # define ERR_CANNOTSENDTOCHAN		"404"
 # define ERR_NOTEXTTOSEND			"412"
 # define ERR_NONICKNAMEGIVEN		"431"

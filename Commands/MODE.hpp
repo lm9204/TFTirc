@@ -28,7 +28,8 @@ class MODE : public Command
 		MODE& operator=(const MODE& other);
 		virtual ~MODE();
 		virtual void	execute(Server& server, Client& client);
-		void	do_command(Server& server, Client& client, std::string name);
+		int		check_cmd(Server& server, Channel	&channel, Client& client);
+		void	do_command(Server& server, std::string name);
 		int		check_client_oper(vector<Client*> cli_list, Client client);
 };
 
