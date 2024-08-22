@@ -31,12 +31,12 @@ void	MODE::do_command(Server& server, Client& client, std::string name)
 		else if (_flag == '-')
 			server.getChannel(name)->removePassword();
 	}
-	else if (_mode == FLAG_L) // channel setmode limit should false change
+	else if (_mode == FLAG_L)
 	{
 		if (_flag == '+')
 			server.getChannel(name)->setMode(Channel::USER_LIMIT, _limit);
 		else
-			server.getChannel(name)->setMode(Channel::USER_LIMIT, 1000000000); //-> 조건 없으면 뭐지
+			server.getChannel(name)->setMode(Channel::USER_LIMIT, -1);
 	}
 }
 
@@ -51,11 +51,6 @@ int		MODE::check_client_oper(vector<Client*> cli_list, Client client)
 	return (0);
 }
 
-//void	MODE::userMode(Server& server, Client& client)
-//{
-//	client.send(":" + client.getHostName() + " 221 " + client.getNickName() + _cmdSource[2] + "\r\n");
-//}
-
 void	MODE::execute(Server& server, Client& client)
 {
 	string	name;
@@ -69,7 +64,7 @@ void	MODE::execute(Server& server, Client& client)
 
 	if (_cmdSource[1][0] != '#')
 	{
-		client.send(":" + client.getHostName() + " 221 " + client.getNickName() + _cmdSource[2] + "\r\n");
+		client.send(":" + client.getHostName() + " 221 " + _cmdSource[1] + " " + _cmdSource[2] + "\r\n");
 		return ;
 	}
 	name = _cmdSource[1];
@@ -77,7 +72,8 @@ void	MODE::execute(Server& server, Client& client)
 	_flag = -1;
 	if (_cmdSource.size() < 3)
 	{
-		client.send(":" + client.getHostName() + " 461 " + client.getNickName() + " :Not enough parameters\r\n");
+		makeNumericMsg(server, client, 461);
+		//client.send(":" + client.getHostName() + " 461 " + client.getNickName() + " :Not enough parameters\r\n");
 		return;
 	}
 	if (check_client_oper(server.getChannel(name)->getOper(), client)!= 1)
@@ -138,8 +134,8 @@ void	MODE::execute(Server& server, Client& client)
 		if (_flag != -1)
 		{
 			do_command(server, client, name);
-			client.send(":" + client.getHostName() + " MODE " + (server.getChannel(name))->getName() + (_flag == '+' ? "+" : "-") + opt + client.getNickName() + "\r\n");
-			std::cout<<":" + client.getHostName() + " MODE " + (server.getChannel(name))->getName() + (_flag == '+' ? "+" : "-") + opt + client.getNickName() + "\r\n";
+			client.send(":" + client.getHostName() + " MODE " + (server.getChannel(name))->getName() + (_flag == FLAG_PLUS ? "+" : "-") + opt + client.getNickName() + "\r\n");
+			std::cout<<":" + client.getHostName() + " MODE " + (server.getChannel(name))->getName() + (_flag == FLAG_PLUS ? "+" : "-") + opt + client.getNickName() + "\r\n";
 		}
 		op_idx++;
 	}
