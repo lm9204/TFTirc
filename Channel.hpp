@@ -39,6 +39,9 @@ class Channel
 		void	kick(Client* user);
 		void	broadcast(string msg);
 		void	broadcast(string msg, Client* except_client);
+		void	invite(string nick);
+		void	accept(string nick);
+		int		isInvited(string nick);
 
 		int		getMode(CHANNEL_OPT type) const;
 		void	setMode(CHANNEL_OPT type, int value);
@@ -50,6 +53,7 @@ class Channel
 		string	_password;
 		string	_topic;
 
+		vector<string>	_invites;
 		vector<Client*>	_users;
 		vector<Client*>	_operators;
 
