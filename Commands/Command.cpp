@@ -108,3 +108,11 @@ const string Command::makeNumericMsg(Server& server, Client& client, Channel& ch
 	return res;
 
 }
+
+int Command::checkNotRegisterClient(Server& server, Client& client) {
+	if (client.getNickName() == "*" || client.getUserName() == "" || client.getRealName() == "") {
+		client.send(makeNumericMsg(server, client, ERR_NOTREGISTERED));
+		return 1;
+	}
+	return 0;
+}
