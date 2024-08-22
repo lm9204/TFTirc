@@ -1,4 +1,4 @@
-#ifndef COMMAND_HPP
+ #ifndef COMMAND_HPP
 # define COMMAND_HPP
 # include "Server.hpp"
 
@@ -14,12 +14,14 @@
 # define ERR_NOSUCHCHANNEL			"403"
 # define ERR_BADCHANNELKEY			"475"
 # define ERR_CHANNELISFULL			"471"
+# define ERR_UNKNOWNMODE			"472"
 # define ERR_INVITEONLYCHAN			"473"
 # define ERR_BADCHANMASK			"476"
 # define RPL_TOPIC					"332"
 # define RPL_NAMREPLY				"353"
 # define RPL_ENDOFNAMES				"366"
 # define ERR_NOTREGISTERED			"451"
+# define ERR_CHANOPRIVSNEEDED		"482"
 # define ERR_UNKNOWNCOMMAND			"421"
 
 using namespace std;
