@@ -136,6 +136,15 @@ int		Server::bindClient()
 	return (1);
 }
 
+void	Server::notify(string nick, string msg)
+{
+	for (size_t i = 0; i < _channels.size(); ++i)
+	{
+		if (_channels[i].checkUserInChannel(nick))
+			_channels[i].broadcast(msg);
+	}
+}
+
 int	Server::createChannel(string ch_name, Client* owner)
 {
 	if (getChannel(ch_name) != NULL)

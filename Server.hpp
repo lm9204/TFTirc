@@ -32,6 +32,7 @@ class Server
 
 		int			bindClient();
 		int			createChannel(string ch_name, Client* owner);
+		void		notify(string nick, string msg);
 		void		deleteChannel(string ch_name);
 		string		getPassword() const;
 		string		getServername() const;
