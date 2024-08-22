@@ -43,19 +43,23 @@ void JOIN::execute(Server& server, Client& client) {
 			continue;
 		}
 		Channel* channel = server.getChannel(this->_cmdSource[1]);
+		// 채널이 존재하지 않는 경우
 		if (channel == NULL) {
 			server.createChannel(this->_cmdSource[1], &client);
 			channel = server.getChannel(this->_cmdSource[1]);
 		}
+		// Key가 존재하고 Key가 맞지 않을 경우
 		if (channel->getPassword() != "" && *keyIt != channel->getPassword()) {
 			client.send(makeNumericMsg(server, client, *channel, ERR_BADCHANNELKEY));
 			continue;
 		}
-		if (channel->getMode(Channel::INVITE_ONLY)) {
-			client.send(makeNumericMsg(server, client, *channel, ERR_INVITEONLYCHAN));
+		// 초대 전용 모드이고 초대되지 않았을 경우
+		if (channel->getMode(Channel::INVITE_ONLY) && !channel->isInvited()) {
+				client.send(makeNumericMsg(server, client, *channel, ERR_INVITEONLYCHAN));
 			continue;
 		}
-		if (channel->getMode(Channel::USER_LIMIT) == static_cast<int>(channel->getUsers().size())) {
+		// 유저 제한이 존재하고 제한을 넘겼을 경우
+		if (channel->getMode(Channel::USER_LIMIT) != 0 && channel->getMode(Channel::USER_LIMIT) <= static_cast<int>(channel->getUsers().size())) {
 			client.send(makeNumericMsg(server, client, *channel, ERR_CHANNELISFULL));
 			continue;
 		}
