@@ -20,6 +20,7 @@
 # define RPL_NAMREPLY				"353"
 # define RPL_ENDOFNAMES				"366"
 # define ERR_NOTREGISTERED			"451"
+# define ERR_UNKNOWNCOMMAND			"421"
 
 using namespace std;
 
