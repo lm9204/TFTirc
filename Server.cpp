@@ -62,7 +62,7 @@ void	Server::run()
 				else
 				{
 					cerr << "client socket error\n";
-					disconnect_client(curr_event->ident, clients);
+					disconnect_client(curr_event->ident);
 				}
 			}
 			else if (curr_event->filter == EVFILT_READ)
@@ -97,11 +97,24 @@ void	Server::change_events(vector<struct kevent>& change_list, uintptr_t ident
 	change_list.push_back(temp_event);
 }
 
-void	Server::disconnect_client(int client_fd, map<int, string>& clients)
+void	Server::disconnect_client(int client_fd)
 {
+	Client* cl = getClient(client_fd);
 	cout << "client disconnected: " << client_fd << endl;
 	close(client_fd);
-	clients.erase(client_fd);
+	for (size_t i = 0; i < _clients.size(); ++i)
+	{
+		if (_clients[i].getSocketFd() == client_fd);
+		{
+			for (size_t j = 0; j < _channels.size(); ++j)
+			{
+				if (_channels[j].checkUserInChannel(cl->getNickName()))
+					_channels[j].leave(cl);
+			}
+			_clients.erase(_clients.begin() + i);
+			return ;
+		}
+	}
 }
 
 int		Server::bindClient()
