@@ -161,6 +161,38 @@ void	Channel::broadcast(string msg, Client* except_client)
 	}
 }
 
+void	Channel::invite(string nick)
+{
+	for (size_t i = 0; i < _invites.size(); ++i)
+	{
+		if (_invites[i] == nick)
+			return;
+	}
+	_invites.push_back(nick);
+}
+
+void	Channel::accept(string nick)
+{
+	for (size_t i = 0; i < _invites.size(); ++i)
+	{
+		if (_invites[i] == nick)
+		{
+			_invites.erase(_invites.begin() + i);
+			return ;
+		}
+	}
+	cout << "[ERROR][" << _getTimestamp() << "][Channel: " << _name << "] " << nick << " is not invited.\n";
+}
+
+int Channel::isInvited(string nick)
+{
+	for (size_t i = 0; i < _invites.size(); ++i)
+	{
+		if (_invites[i] == nick)
+			return (1);
+	}
+	return (0);
+}
 
 int	Channel::getMode(CHANNEL_OPT type) const
 {
