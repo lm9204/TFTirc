@@ -5,6 +5,7 @@
 #include "PRIVMSG.hpp"
 #include "JOIN.hpp"
 #include "MODE.hpp"
+#include "PASS.hpp"
 #include "UNKNOWN.hpp"
 #include <sstream>
 #include <iostream>
@@ -16,6 +17,7 @@ CommandController::CommandController() {
 	this->_commands["PRIVMSG"] = new PRIVMSG();
 	this->_commands["JOIN"] = new JOIN();
 	this->_commands["MODE"] = new MODE();
+	this->_commands["PASS"] = new PASS();
 	this->_commands["UNKNOWN"] = new UNKNOWN();
 }
 
