@@ -28,6 +28,7 @@ class Channel
 		string	getPassword() const;
 
 		int		isOper(Client* user) const;
+		int		checkUserInChannel(string nick) const;
 		void	setOper(Client* user);
 		void	setPassword(string password);
 		void	setTopic(string topic);

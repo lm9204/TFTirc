@@ -53,6 +53,11 @@ int		Channel::isOper(Client* user) const
 	return _exist(_operators, user->getNickName());
 }
 
+int		Channel::checkUserInChannel(string nick) const
+{
+	return _exist(_users, nick);
+}
+
 /* need oper */
 void	Channel::setOper(Client* user)
 {

@@ -26,17 +26,16 @@ class Server
 		Server(int port, string password);
 		~Server();
 
-		void	run();
-		void	change_events(vector<struct kevent>& change_list, uintptr_t ident, int16_t filter, uint16_t flags, uint32_t fflags, intptr_t data, void *udata);
-		void	disconnect_client(int client_fd, map<int, string>& clients);
+		void		run();
+		void		change_events(vector<struct kevent>& change_list, uintptr_t ident, int16_t filter, uint16_t flags, uint32_t fflags, intptr_t data, void *udata);
+		void		disconnect_client(int client_fd);
 
-		int		bindClient();
-		int		createChannel(string ch_name, Client* owner);
-
-		void	deleteChannel(string ch_name); // *
-		string	getPassword() const; // *
-		string	getServername() const;
-		
+		int			bindClient();
+		int			createChannel(string ch_name, Client* owner);
+		void		notify(string nick, string msg);
+		void		deleteChannel(string ch_name);
+		string		getPassword() const;
+		string		getServername() const;
 		Client*		getClient(int fd);
 		Client*		getClient(string nick);
 		Channel*	getChannel(string ch_name);
