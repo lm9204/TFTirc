@@ -117,6 +117,10 @@ void	MODE::execute(Server& server, Client& client)
 	}
 	name = _cmdSource[1];
 	_flag = -1;
+	// 인자 초기화가 안되어있음.
+	_key = "";
+	_limit = 0;
+	_mode = 0;
 	channel = server.getChannel(name);
 	if (channel == NULL)
 	{
@@ -139,9 +143,16 @@ void	MODE::execute(Server& server, Client& client)
 		return;
 	}
 	option = _cmdSource[2];
+
+	// option 하나씩 체크
 	for (int op_idx = 0; op_idx < static_cast<int>(option.size()); op_idx++)
 	{
 		opt = option[op_idx];
+
+		// 만약 현재 값이 +면?
+		// _flag를 true로 바꾸고 
+		// respond의 맨 마지막 문자열이 +거나 -면 해당 부분을 제거함.
+		// 현재 부호를 추가함
 		if (opt == '+')
 		{
 			_flag = true;
@@ -158,6 +169,19 @@ void	MODE::execute(Server& server, Client& client)
 			respond += opt;
 			continue;
 		}
+		/**
+		 * 현재가 i 면?
+		 * _mode 를 FLAG_I로
+		 * 
+		 * t 면?
+		 * _mode 를 FLAG_T로
+		 * 
+		 * l 이면?
+		 * _mode를 FLAG_L로
+		 * * _flag가 true면?
+		 * * 모드에 맞는 인자를 꺼냄
+		 * * 
+		 */
 		if (opt == 'i')
 		{
 			_mode = FLAG_I;
@@ -199,14 +223,15 @@ void	MODE::execute(Server& server, Client& client)
 		else if (opt == 'o')
 		{
 			_mode = FLAG_O;
-			if (_flag == true)
-			{
+			// -o일 때 처리가 안되어있음
+			// if (_flag == true)
+			// {
 				if (cmd_idx < static_cast<int>(_cmdSource.size()))
 					_key = _cmdSource[cmd_idx];
 				else
 					continue;
 				cmd_idx++;
-			}
+			// }
 		}
 		else
 		{
@@ -218,7 +243,7 @@ void	MODE::execute(Server& server, Client& client)
 		{
 			respond += opt;
 			do_command(server, name);
-			if ((_mode == FLAG_K && _flag == true) ||(_mode == FLAG_L && _flag == true))
+			if ((_mode == FLAG_K && _flag == true) || (_mode == FLAG_L && _flag == true) || (_mode == FLAG_O))
 			{
 				if (respond_arg != "")
 					respond_arg += " ";
