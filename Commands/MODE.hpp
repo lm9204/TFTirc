@@ -7,10 +7,10 @@
 class MODE : public Command
 {
 	private:
-		string	_key;
-		int		_flag;
-		int		_limit;
-		int		_mode;
+		string			_key;
+		int				_flag;
+		long long		_limit;
+		int				_mode;
 	public:
 		typedef enum
 		{
@@ -19,8 +19,6 @@ class MODE : public Command
 			FLAG_K,
 			FLAG_O,
 			FLAG_L,
-			FLAG_PLUS,
-			FLAG_MINUS,
 		} MODE_OPTION;
 
 		MODE();

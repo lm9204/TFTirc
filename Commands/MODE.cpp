@@ -20,24 +20,24 @@ void	MODE::do_command(Server& server, std::string name)
 		server.getChannel(name)->setMode(Channel::TOPIC_OPER_ONLY, _flag);
 	else if (_mode == FLAG_O)
 	{
-		if (_flag == FLAG_PLUS)
+		if (_flag == true)
 			server.getChannel(name)->setOper(server.getClient(_key));
 		else
 			server.getChannel(name)->removeOper(server.getClient(_key));
 	}
 	else if (_mode == FLAG_K)
 	{
-		if (_flag == FLAG_PLUS)
+		if (_flag == true)
 			server.getChannel(name)->setPassword(_key);
 		else
 			server.getChannel(name)->removePassword();
 	}
 	else if (_mode == FLAG_L)
 	{
-		if (_flag == FLAG_PLUS)
+		if (_flag == true)
 			server.getChannel(name)->setMode(Channel::USER_LIMIT, _limit);
 		else
-			server.getChannel(name)->setMode(Channel::USER_LIMIT, -1);
+			server.getChannel(name)->setMode(Channel::USER_LIMIT, 0);
 	}
 }
 
@@ -58,26 +58,28 @@ int	MODE::check_cmd(Server& server, Channel	&channel, Client& client)
 
 	if (_mode == FLAG_I)
 	{
-		if (_flag == FLAG_PLUS && channel.getMode(Channel::INVITE_ONLY) == FLAG_PLUS)
+		if (_flag == true && channel.getMode(Channel::INVITE_ONLY) == true)
 			return (false);
-		if (_flag == FLAG_MINUS && channel.getMode(Channel::INVITE_ONLY) == FLAG_MINUS)
+		if (_flag == false && channel.getMode(Channel::INVITE_ONLY) == false)
 			return (false);
 	}
 	if (_mode == FLAG_T)
 	{
-		if (_flag == FLAG_PLUS && channel.getMode(Channel::TOPIC_OPER_ONLY) == FLAG_PLUS)
+		if (_flag == true && channel.getMode(Channel::TOPIC_OPER_ONLY) == true)
 			return (false);
-		if (_flag == FLAG_MINUS && channel.getMode(Channel::TOPIC_OPER_ONLY) == FLAG_MINUS)
+		if (_flag == false && channel.getMode(Channel::TOPIC_OPER_ONLY) == false)
 			return (false);
 	}
 	if (_mode == FLAG_L)
 	{
-		if (_flag == FLAG_MINUS && channel.getMode(Channel::USER_LIMIT) == -1)
+		if (_limit < 1 || _limit > 2147483647)
+			return (false);
+		if (_flag == false && channel.getMode(Channel::USER_LIMIT) == -1)
 			return (false);
 	}
 	if (_mode == FLAG_K)
 	{
-		if (_flag == FLAG_MINUS && channel.getPassword() == "") //key 없을 때 기본값 뭐지
+		if (_flag == false && channel.getPassword() == "")
 			return (false);
 	}
 	if (_mode == FLAG_O)
@@ -88,9 +90,9 @@ int	MODE::check_cmd(Server& server, Channel	&channel, Client& client)
 			client.send(makeNumericMsg(server, client, "401"));
 			return (false);
 		}
-		if (_flag == FLAG_PLUS && channel.isOper(temp) == true)
+		if (_flag == true && channel.isOper(temp) == true)
 			return (false);
-		if (_flag == FLAG_MINUS && channel.isOper(temp) == false)
+		if (_flag == false && channel.isOper(temp) == false)
 			return (false);
 	}
 	return (true);
@@ -127,7 +129,7 @@ void	MODE::execute(Server& server, Client& client)
 		client.send(makeNumericMsg(server, client, "461"));
 		return;
 	}
-	if (check_client_oper(channel->getOper(), client)!= 1)
+	if (check_client_oper(channel->getOper(), client) != 1)
 	{
 		client.send(makeNumericMsg(server, client, channel->getName(), "482"));
 		return;
@@ -137,7 +139,7 @@ void	MODE::execute(Server& server, Client& client)
 		opt = option[op_idx];
 		if (opt == '+')
 		{
-			_flag = FLAG_PLUS;
+			_flag = true;
 			if (respond != "" && (respond[respond.size() - 1] == '+' || respond[respond.size() - 1] == '-'))
 				respond = respond.substr(0, respond.size() - 1);
 			respond += opt;
@@ -145,7 +147,7 @@ void	MODE::execute(Server& server, Client& client)
 		}
 		else if (opt == '-')
 		{
-			_flag = FLAG_MINUS;
+			_flag = false;
 			if (respond != "" && (respond[respond.size() - 1] == '+' || respond[respond.size() - 1] == '-'))
 				respond = respond.substr(0, respond.size() - 1);
 			respond += opt;
@@ -160,12 +162,17 @@ void	MODE::execute(Server& server, Client& client)
 		else if (opt == 'l')
 		{
 			_mode = FLAG_L;
-			if (_flag == FLAG_PLUS)
+			if (_flag == true)
 			{
 				if (cmd_idx < static_cast<int>(_cmdSource.size()))
 				{
-					ss << _cmdSource[cmd_idx];
-					ss >> _limit;
+					if (_cmdSource[cmd_idx].size() > 10)
+						_limit = 0;
+					else
+					{
+						ss << _cmdSource[cmd_idx];
+						ss >> _limit;
+					}
 				}
 				else
 					continue;
@@ -175,7 +182,7 @@ void	MODE::execute(Server& server, Client& client)
 		else if (opt == 'k')
 		{
 			_mode = FLAG_K;
-			if (_flag == FLAG_PLUS)
+			if (_flag == true)
 			{
 				if (cmd_idx < static_cast<int>(_cmdSource.size()))
 					_key = _cmdSource[cmd_idx];
@@ -187,7 +194,7 @@ void	MODE::execute(Server& server, Client& client)
 		else if (opt == 'o')
 		{
 			_mode = FLAG_O;
-			if (_flag == FLAG_PLUS)
+			if (_flag == true)
 			{
 				if (cmd_idx < static_cast<int>(_cmdSource.size()))
 					_key = _cmdSource[cmd_idx];
@@ -206,7 +213,7 @@ void	MODE::execute(Server& server, Client& client)
 		{
 			respond += opt;
 			do_command(server, name);
-			if ((_mode == FLAG_K && _flag == FLAG_PLUS) ||(_mode == FLAG_L && _flag == FLAG_PLUS))
+			if ((_mode == FLAG_K && _flag == true) ||(_mode == FLAG_L && _flag == true))
 			{
 				if (respond_arg != "")
 					respond_arg += " ";
@@ -217,16 +224,8 @@ void	MODE::execute(Server& server, Client& client)
 	if (respond.size() > 1)
 	{
 		if (respond_arg != "")
-			client.send(string(":") + client.getNickName() + "!~" +client.getUserName() + "@" + client.getHostName() + " MODE " + channel->getName() + " " + respond + " " + respond_arg + "\r\n");
+			channel->broadcast(string(":") + client.getNickName() + "!~" +client.getUserName() + "@" + client.getHostName() + " MODE " + channel->getName() + " " + respond + " " + respond_arg + "\r\n");
 		else
-			client.send(string(":") + client.getNickName() + "!~" +client.getUserName() + "@" + client.getHostName() + " MODE " + channel->getName() + " " + respond + "\r\n");
+			channel->broadcast(string(":") + client.getNickName() + "!~" +client.getUserName() + "@" + client.getHostName() + " MODE " + channel->getName() + " " + respond + "\r\n");
 	}
 }
-	//:<server_name> MODE <channel/user> <mode> <params>
-	//어떤 채널에서 명령어를 실행했는지 찾아봐야함.-> 클라이언트 명령어 보고 채널 탐색하기.
-	/*
-	MODE -> 명령어
-	#123 -> 채널이름
-	-iiioi+oo -> 모드 옵션
-	*/
-	// 이런 형식으로 들어오게 된다.
