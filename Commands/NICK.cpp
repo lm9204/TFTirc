@@ -38,11 +38,13 @@ void NICK::execute(Server& server, Client& client) {
 		client.send(makeNumericMsg(server, client, ERR_NICKNAMEINUSE));
 		return ;
 	}
+	server.notify(client.getNickName(), ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
 	client.send(":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
-	// client.send(":" + client.getNickName() + "!" + "testa" + "@" + "testb" + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
-	client.setNickName(this->_cmdSource[1]);
-	if (client.getUserName() != "" && client.getRealName() != "")
+	if (client.getNickName() == "*" && client.getUserName() != "" && client.getRealName() != "") {
+		client.setNickName(this->_cmdSource[1]);
 		client.send(makeNumericMsg(server, client, RPL_WELCOME));
+	} else 
+		client.setNickName(this->_cmdSource[1]);
 }
 
 /*
