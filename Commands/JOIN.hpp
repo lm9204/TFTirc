@@ -16,6 +16,7 @@ class JOIN: public Command {
 		void fillTargetChannel();
 		void fillTargetKey();
 		void scaleTarget();
+		bool checkValidChannelName(const string& name);
 		vector<string> targetChannel;
 		vector<string> targetKey;
 };
