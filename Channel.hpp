@@ -19,10 +19,13 @@ class Channel
 
 		Channel(string empty);
 		Channel(string name, Client* owner);
+		Channel(const Channel& ref);
 		~Channel();
+		Channel&	operator=(const Channel& ref);
 		
 		vector<Client*>	getUsers() const;
 		vector<Client*>	getOper() const;
+		vector<string> getInvites() const;
 		string	getName() const;
 		string	getTopic() const;
 		string	getPassword() const;

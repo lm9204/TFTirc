@@ -12,6 +12,8 @@ class Client
 {
 	public:
 		Client(int fd, string client_addr);
+		Client(const Client& ref);
+		Client& operator=(const Client& ref);
 		~Client();
 
 		vector<string>	split(string line, char delim);
@@ -44,4 +46,5 @@ class Client
 		int		_fd;
 };
 
+std::ostream& operator<<(std::ostream& os, const Client& ref);
 #endif
