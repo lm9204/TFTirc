@@ -1,4 +1,8 @@
 #include <iostream>
+#include <sstream>
+#include <string>
+#include <chrono>
+#include <iomanip>
 #include "Server.hpp"
 #include "Command.hpp"
 
@@ -33,6 +37,8 @@ void	Server::run()
 	map<int, string>		clients;
 
 	change_events(_change_list, _socket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
+	//debugging
+	change_events(_change_list, STDIN_FILENO, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
 	cout << "server started\n";
 
 	int new_events;
@@ -65,11 +71,16 @@ void	Server::run()
 					disconnect_client(curr_event->ident);
 				}
 			}
+			else if (curr_event->flags & EV_EOF)
+				disconnect_client(curr_event->ident);
+			else if (curr_event->ident == STDIN_FILENO)
+			{
+				debugger();
+			}
 			else if (curr_event->filter == EVFILT_READ)
 			{
 				if ((int)curr_event->ident == _socket)
 				{
-					cout << "bind Client\n";
 					bindClient();
 				}
 				else if (getClient(curr_event->ident)->getSocketFd() != -1)
@@ -88,6 +99,42 @@ void	Server::run()
 	}
 }
 
+void	Server::debugger()
+{
+	char buf[1024];
+	size_t n = read(STDIN_FILENO, buf, sizeof(buf) - 1);
+	if (n > 0)
+	{
+		buf[n] = 0;
+		string str(buf);
+		istringstream	iss(str);
+		string			cmd, token;
+
+		iss >> cmd;
+		iss >> token;
+		//channel
+		if (cmd == "showc")
+		{
+			Channel* ch = getChannel(token);
+			if (ch != nullptr)
+				cout << *ch;
+			else
+				cout << "[INFO][DEBUGGER] NO SUCH CHANNEL\n";
+		}
+		//user
+		else if (cmd == "showu")
+		{
+			Client* cl = getClient(token);
+			if (cl != nullptr)
+				cout << *cl;
+			else
+				cout << "[INFO][DEBUGGER] NO SUCH CLIENT\n";
+		}
+		else
+			cout << "[INFO][DEBUGGER] UNKNOWN COMMAND\n";
+	}
+}
+
 void	Server::change_events(vector<struct kevent>& change_list, uintptr_t ident
 		, int16_t filter, uint16_t flags, uint32_t fflags, intptr_t data, void *udata)
 {
@@ -100,7 +147,7 @@ void	Server::change_events(vector<struct kevent>& change_list, uintptr_t ident
 void	Server::disconnect_client(int client_fd)
 {
 	Client* cl = getClient(client_fd);
-	cout << "client disconnected: " << client_fd << endl;
+	cout << "[INFO][" << _getTimestamp() << "] Client " << client_fd << "th fd disconnected\n";
 	close(client_fd);
 	for (size_t i = 0; i < _clients.size(); ++i)
 	{
@@ -127,7 +174,7 @@ int		Server::bindClient()
 		cerr << "accept error\n";
 		return (0);
 	}
-	cout << "accept new client: " << so_client << "\n";
+	cout << "[INFO][" << _getTimestamp() << "][ACCEPT] New client at " << so_client << "th fd\n";
 	_clients.push_back(Client(so_client, static_cast<string>(inet_ntoa(client_addr.sin_addr))));
 	fcntl(so_client, F_SETFL, O_NONBLOCK);
 
@@ -159,6 +206,18 @@ int	Server::createChannel(string ch_name, Client* owner)
 	}
 }
 
+void	Server::deleteChannel(string ch_name)
+{
+	for (size_t i = 0; i < _channels.size(); ++i)
+	{
+		if (_channels[i].getName() == ch_name)
+		{
+			_channels.erase(_channels.begin() + i);
+			return ;
+		}
+	}
+}
+
 string	Server::getPassword() const
 {
 	return _password;
@@ -178,8 +237,6 @@ Client*	Server::getClient(int fd)
 			return &(*it);
 		it++;
 	}
-	cout << "cannot find " << fd << " user\n";
-	//throw
 	return NULL;
 }
 
@@ -192,8 +249,6 @@ Client*	Server::getClient(string nick)
 			return &(*it);
 		it++;
 	}
-	cout << "cannot find " << nick << " user\n";
-	//throw
 	return NULL;
 }
 
@@ -212,4 +267,16 @@ void	handle_error(string err)
 {
 	cerr << err << "\n";
 	exit(1);
+}
+
+string	Server::_getTimestamp()
+{
+	chrono::system_clock::time_point now = chrono::system_clock::now();
+	time_t now_time = chrono::system_clock::to_time_t(now);
+	
+	// 스트림에 시간을 포맷팅하여 출력
+	stringstream	ss;
+	ss << put_time(localtime(&now_time), "%Y-%m-%d %H:%M:%S");
+	
+	return ss.str();
 }
