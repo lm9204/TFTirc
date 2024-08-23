@@ -65,7 +65,7 @@ const string Command::makeNumericMsg(Server& server, Client& client, const strin
 	} else if (num == ERR_CANNOTSENDTOCHAN) {
 		res += client.getNickName() + " " + name + " " + ":Cannot send to channel";
 	} else if (num == ERR_NOSUCHCHANNEL) {
-		res += client.getNickName() + " " + name + "chann " + ":No such channel";
+		res += client.getNickName() + " " + name + " " + ":No such channel";
 	} else if (num == ERR_CHANOPRIVSNEEDED) {
 		res += client.getNickName() + " " + name + " " + ":You're not channel operator";
 	} else if (num == ERR_UNKNOWNMODE) {
@@ -90,8 +90,6 @@ const string Command::makeNumericMsg(Server& server, Client& client, Channel& ch
 		res += client.getNickName() + " " + channel.getName() + " " + ":Cannot join channel (+l)";
 	} else if (num == ERR_INVITEONLYCHAN) {
 		res += client.getNickName() + " " + channel.getName() + " " + ":Cannot join channel (+i)";
-	//} else if (num == RPL_CHANNELMODEIS) {
-	//	res += client.getNickName() + " " + channel.getName();
 	} else if (num == RPL_TOPIC) {
 		res += client.getNickName() + " " + channel.getName() + " " + ":" + channel.getTopic();
 	} else if (num == RPL_NAMREPLY) {
