@@ -91,7 +91,9 @@ void JOIN::fillTargetChannel() {
 }
 
 void JOIN::fillTargetKey() {
-	string targets = this->_cmdSource[1];
+	if (this->_cmdSource.size() < 3)
+		return ;
+	string targets = this->_cmdSource[2];
 	for (string::iterator it = targets.begin(); it != targets.end(); it++)
 		if (*it == ',')
 			*it = ' ';
