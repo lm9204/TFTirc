@@ -29,6 +29,7 @@ class Server
 		void		run();
 		void		change_events(vector<struct kevent>& change_list, uintptr_t ident, int16_t filter, uint16_t flags, uint32_t fflags, intptr_t data, void *udata);
 		void		disconnect_client(int client_fd);
+		void		debugger();
 
 		int			bindClient();
 		int			createChannel(string ch_name, Client* owner);
@@ -40,6 +41,7 @@ class Server
 		Client*		getClient(string nick);
 		Channel*	getChannel(string ch_name);
 
+		static string	_getTimestamp();
 
 	private:
 		//error Client(-1)

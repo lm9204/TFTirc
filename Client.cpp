@@ -2,10 +2,29 @@
 #include <sstream>
 
 #include "Client.hpp"
+#include "Server.hpp"
 
 Client::Client(int fd, string client_addr) : _nick("*"), _host(client_addr), _fd(fd)
 {
-	cout << "new client connect. user: " << _nick << "socket: " << _fd << "\n";
+}
+
+Client::Client(const Client& ref) : _nick(ref._nick), _host(ref._host), _fd(ref._fd)
+{
+	*this = ref;
+}
+
+Client&	Client::operator=(const Client& ref)
+{
+	if (this == &ref)
+		return *this;
+		
+	_nick = ref._nick;
+	_fd = ref._fd;
+	_user = ref._user;
+	_host = ref._host;
+	_real = ref._real;
+	_buf = ref._buf;
+	return *this;
 }
 
 Client::~Client()
@@ -103,7 +122,8 @@ int		Client::recv()
 	{
 		buf[n] = 0;
 		_buf += buf;
-		cout << "received data from " << _fd << ":" << buf << "\n";
+		buf[n - 2] = 0;
+		cout << "[INFO][" << Server::_getTimestamp() << "] RECV: " << buf << " by " << _fd << "th fd.\n"; 
 	}
 	return (1);
 }
@@ -135,4 +155,18 @@ vector<string>	Client::split(string line, char delim)
 void Client::flushBuf()
 {
 	this->_buf.clear();
+}
+
+std::ostream&	operator<<(std::ostream& os, const Client& cl)
+{
+	os << "----------------------------------------------------\n";
+	os << "[INFO][" << Server::_getTimestamp() << "][Client: " << cl.getNickName() << "] Summary: \n";
+	os << "\tUsername: " << cl.getUserName() << ".\n";
+	os << "\tHostname: " << cl.getHostName() << ".\n";
+	os << "\tRealname: " << cl.getRealName() << ".\n";
+	os << "\tFD: " << cl.getSocketFd() << ".\n";
+	os << "\tBuf: [" << cl.getBuf() << "].\n";
+
+	os << "----------------------------------------------------\n";
+	return os;
 }

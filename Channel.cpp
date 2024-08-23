@@ -2,7 +2,7 @@
 #include <chrono>
 #include <iomanip>
 #include <sstream>
-
+#include "MODE.hpp"
 #include "Channel.hpp"
 
 Channel::Channel(string empty) : _name(empty)
@@ -10,16 +10,40 @@ Channel::Channel(string empty) : _name(empty)
 	cout << "[INFO][" << _getTimestamp() << "] Error Channel object created.\n";
 }
 
-Channel::Channel(string name, Client* owner) : _name(name), _inviteOnly(0), _topicOpOnly(1), _user_limit(0)
+Channel::Channel(string name, Client* owner) : _name(name), _inviteOnly(0), _topicOpOnly(0), _user_limit(0)
 {
 	cout << "[INFO][" << _getTimestamp() << "][Channel: " << name << "] Created Successfully by " << owner->getNickName() << ".\n";
-	join(owner);
 	setOper(owner);
+}
+
+Channel::Channel(const Channel& ref)
+{
+	*this = ref;
+	cout << "[INFO][" << _getTimestamp() << "][Channel: " << ref._name << "] Created Successfully inside vector.\n";
 }
 
 Channel::~Channel()
 {
 	cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Channel deleted.\n";
+}
+
+Channel&	Channel::operator=(const Channel& ref)
+{
+	if (this == &ref)
+		return *this;
+	
+	cout << "[INFO][" << _getTimestamp() << "][Channel: " << ref._name << "] Assignment Operator is called.\n";
+	this->_name = ref._name;
+	this->_inviteOnly = ref._inviteOnly;
+	this->_topicOpOnly = ref._topicOpOnly;
+	this->_user_limit = ref._user_limit;
+	this->_topic = ref._topic;
+	this->_password = ref._password;
+	for (size_t i = 0; i < ref._users.size(); ++i)
+		this->_users.push_back(ref._users[i]);
+	for (size_t i = 0; i < ref._operators.size(); ++i)
+		this->_operators.push_back(ref._operators[i]);
+	return *this;
 }
 
 vector<Client*>	Channel::getUsers() const
@@ -30,6 +54,11 @@ vector<Client*>	Channel::getUsers() const
 vector<Client*>	Channel::getOper() const
 {
 	return this->_operators;
+}
+
+vector<string>	Channel::getInvites() const
+{
+	return this->_invites;
 }
 
 string	Channel::getName() const
@@ -221,11 +250,11 @@ void	Channel::setMode(CHANNEL_OPT type, int value)
 	{
 		case INVITE_ONLY:
 			_inviteOnly = value;
-			cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Channel INVITE_ONLY option changed to " << (value ? "true" : "false") << ".\n";
+			cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Channel INVITE_ONLY option changed to " << ((value == MODE::FLAG_PLUS) ? "true" : "false") << ".\n";
 			break;
 		case TOPIC_OPER_ONLY:
 			_topicOpOnly = value;
-			cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Channel TOPIC_OPER_ONLY option changed to " << (value ? "true" : "false") << ".\n";
+			cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Channel TOPIC_OPER_ONLY option changed to " << ((value == MODE::FLAG_PLUS) ? "true" : "false") << ".\n";
 			break;
 		case USER_LIMIT:
 			_user_limit = value;
@@ -268,6 +297,7 @@ int		Channel::_exist(vector<Client*> group, string nick) const
 std::ostream&	operator<<(std::ostream& os, const Channel& ch)
 {
 	vector<Client*> users = ch.getUsers();
+	vector<string> invites = ch.getInvites();
 	os << "----------------------------------------------------\n";
 	os << "[INFO][" << ch._getTimestamp() << "][Channel: " << ch.getName() << "] Summary: \n";
 	os << "\t - Channel Mode Settings\n";
@@ -277,7 +307,12 @@ std::ostream&	operator<<(std::ostream& os, const Channel& ch)
 	os << "\t - Current Users (" << users.size() << "):\n";
 	for (size_t i = 0; i < users.size(); ++i)
 	{
-		os << "\t\t [" << i + 1 << "] Name: " << users[i] << ", Role: " << (ch.isOper(users[i]) == 1 ? "Operator" : "User") << "\n";
+		os << "\t\t [" << i + 1 << "] Name: " << users[i]->getNickName() << ", Role: " << (ch.isOper(users[i]) == 1 ? "Operator" : "User") << "\n";
+	}
+	os << "\t - Current Invites (" << invites.size() << "):\n";
+	for (size_t i = 0; i < invites.size(); ++i)
+	{
+		os << "\t\t [" << i + 1 << "] Name: " << invites[i] << "\n";
 	}
 	os << "----------------------------------------------------\n";
 	return os;
