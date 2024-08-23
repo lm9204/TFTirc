@@ -3,6 +3,7 @@
 # include "Server.hpp"
 
 # define RPL_WELCOME				"001"
+# define RPL_CHANNELMODEIS			"324"
 # define RPL_TOPIC					"332"
 # define RPL_NAMREPLY				"353"
 # define RPL_ENDOFNAMES				"366"
@@ -46,6 +47,7 @@ class Command {
 		virtual void execute(Server& server, Client& client) = 0;
 		void setCmdSource(vector<string>& cmdSource);
 	protected:
+		string  get_channel_mode(Channel& channel);
 		int checkNotRegisterClient(Server& server, Client& client);
 		const string makeNumericMsg(Server& server, Client& client, const string& num);
 		const string makeNumericMsg(Server& server, Client& client, const string& name, const string& num);

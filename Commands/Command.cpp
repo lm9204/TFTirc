@@ -1,4 +1,5 @@
 #include "Command.hpp"
+#include <sstream>
 
 Command::Command() {
 	
@@ -94,6 +95,8 @@ const string Command::makeNumericMsg(Server& server, Client& client, Channel& ch
 		res += client.getNickName() + " " + channel.getName() + " " + ":Cannot join channel (+i)";
 	} else if (num == RPL_TOPIC) {
 		res += client.getNickName() + " " + channel.getName() + " " + ":" + channel.getTopic();
+	} else if (num == RPL_CHANNELMODEIS) {
+		res += client.getNickName() + " " + channel.getName() + " " + get_channel_mode(channel);//+ ":" + channel.getTopic();
 	} else if (num == RPL_NAMREPLY) {
 		vector<Client*> clients = channel.getUsers();
 		res += client.getNickName() + " " + "=" + " " + channel.getName() + " " + ":";
@@ -116,6 +119,40 @@ const string Command::makeNumericMsg(Server& server, Client& client, Channel& ch
 	return res;
 
 }
+
+string Command::get_channel_mode(Channel& channel)
+{
+	stringstream ss;
+	std::string	mode = "+";
+	std::string	mode_arg = "";
+
+	if (channel.getMode(Channel::INVITE_ONLY) == true)
+		mode += 'i';
+	if (channel.getMode(Channel::TOPIC_OPER_ONLY) == true)
+		mode += 't';
+	if (channel.getMode(Channel::USER_LIMIT) != 0)
+	{
+		mode += 'l';
+		if (mode_arg != "" )
+			mode_arg += " ";
+		ss << channel.getMode(Channel::USER_LIMIT);
+		mode_arg += ss.str();
+	}
+	if (channel.getPassword() != "")
+	{
+		mode += 'k';
+		if (mode_arg != "" )
+			mode_arg += " ";
+		mode_arg += channel.getPassword();
+	}
+	if (mode_arg != "")
+		mode += " ";
+	mode += mode_arg;
+	if (mode == "+")
+		mode = "";
+	return (mode);
+}
+
 
 int Command::checkNotRegisterClient(Server& server, Client& client) {
 	if (client.getNickName() == "*" || client.getUserName() == "" || client.getRealName() == "") {

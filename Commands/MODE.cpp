@@ -116,7 +116,6 @@ void	MODE::execute(Server& server, Client& client)
 		return ;
 	}
 	name = _cmdSource[1];
-	option = _cmdSource[2];
 	_flag = -1;
 	channel = server.getChannel(name);
 	if (channel == NULL)
@@ -124,16 +123,22 @@ void	MODE::execute(Server& server, Client& client)
 		client.send(makeNumericMsg(server, client, "403", name));
 		return ;
 	}
-	if (_cmdSource.size() < 3)
+	if (_cmdSource.size() < 2)
 	{
 		client.send(makeNumericMsg(server, client, "461"));
 		return;
+	}
+	if (_cmdSource.size() == 2)
+	{
+		client.send(makeNumericMsg(server, client, *channel, "324"));
+		return ;
 	}
 	if (check_client_oper(channel->getOper(), client) != 1)
 	{
 		client.send(makeNumericMsg(server, client, channel->getName(), "482"));
 		return;
 	}
+	option = _cmdSource[2];
 	for (int op_idx = 0; op_idx < static_cast<int>(option.size()); op_idx++)
 	{
 		opt = option[op_idx];
