@@ -36,7 +36,7 @@ void JOIN::execute(Server& server, Client& client) {
 	vector<string>::iterator channelIt, keyIt;
 	for (channelIt = this->targetChannel.begin(), keyIt = this->targetKey.begin(); channelIt != this->targetChannel.end() && keyIt != this->targetKey.end(); channelIt++, keyIt++) {
 		this->_cmdSource[1] = *channelIt;
-		if (checkValidChannelName(this->_cmdSource[1])) {
+		if (!checkValidChannelName(this->_cmdSource[1])) {
 			client.send(makeNumericMsg(server, client, this->_cmdSource[1], ERR_BADCHANMASK));
 			continue;
 		}
