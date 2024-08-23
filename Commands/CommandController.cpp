@@ -6,6 +6,10 @@
 #include "JOIN.hpp"
 #include "MODE.hpp"
 #include "PASS.hpp"
+#include "KICK.hpp"
+#include "TOPIC.hpp"
+#include "INVITE.hpp"
+#include "PART.hpp"
 #include "UNKNOWN.hpp"
 #include <sstream>
 #include <iostream>
@@ -18,6 +22,10 @@ CommandController::CommandController() {
 	this->_commands["JOIN"] = new JOIN();
 	this->_commands["MODE"] = new MODE();
 	this->_commands["PASS"] = new PASS();
+	this->_commands["KICK"] = new KICK();
+	this->_commands["INVITE"] = new INVITE();
+	this->_commands["TOPIC"] = new TOPIC();
+	this->_commands["PART"] = new PART();
 	this->_commands["UNKNOWN"] = new UNKNOWN();
 }
 

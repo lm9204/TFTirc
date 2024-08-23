@@ -14,6 +14,7 @@ class PART: public Command {
 		~PART();
 
 		virtual void execute(Server& server, Client& client);
+		vector<string>	splitMsg(string channel);
 };
 
 #endif
