@@ -34,7 +34,7 @@ void	INVITE::execute(Server& server, Client& client)
 		}
 		if ((*it)->getNickName() == invitee)
 		{
-			client.send(makeNumericMsg(server, client, ch_name, "443"));
+			client.send(":" + server.getServername() + " 443 " + client.getNickName() + " " + invitee + " " + ch->getName() + "\r\n");
 			return;
 		}
 	}

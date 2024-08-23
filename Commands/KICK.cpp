@@ -37,6 +37,11 @@ void	KICK::execute(Server& server, Client& client)
 		client.send(makeNumericMsg(server, client, ch_name, "403"));
 		return;
 	}
+	if (!ch->isOper(&client))
+	{
+		client.send(makeNumericMsg(server, client, ch_name, "482"));
+		return ;
+	}
 
 	for (vector<s_msg>::iterator it = msgs.begin(); it != msgs.end(); ++it)
 	{
