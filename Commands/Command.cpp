@@ -72,6 +72,10 @@ const string Command::makeNumericMsg(Server& server, Client& client, const strin
 		res += client.getNickName() + " " + name + " " + ":is unknown mode char to me";
 	} else if (num == ERR_BADCHANMASK) {
 		res += name + " " + ":Bad Channel Mask";
+	} else if (num == ERR_NOTONCHANNEL) {
+		res += client.getNickName() + " " + name + " :You're not on that channel";
+	} else if (num == ERR_NOSUCHCHANNEL) {
+		res += client.getNickName() + " " + name + " :No such channel";
 	} else {
 		return "";
 	}
