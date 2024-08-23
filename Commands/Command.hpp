@@ -9,7 +9,6 @@
 # define RPL_INVITING				"341"
 # define RPL_NAMREPLY				"353"
 # define RPL_ENDOFNAMES				"366"
-# define ERR_NOSUCHCHANNEL			"403"
 # define ERR_CANNOTSENDTOCHAN		"404"
 # define ERR_NOTEXTTOSEND			"412"
 # define ERR_UNKNOWNCOMMAND			"421"
