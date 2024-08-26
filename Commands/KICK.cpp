@@ -50,8 +50,8 @@ void	KICK::execute(Server& server, Client& client)
 			client.send(makeNumericMsg(server, client, (*it).nick, "401"));
 			continue;
 		}
-		ch->kick(server.getClient((*it).nick));
 		ch->broadcast(":" + client.who() + " KICK " + ch_name + " " +  (*it).nick + " :" + (*it).reason + "\r\n");
+		ch->kick(server.getClient((*it).nick));
 	}
 }
 
