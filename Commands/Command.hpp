@@ -48,7 +48,7 @@ class Command {
 		void setCmdSource(vector<string>& cmdSource);
 	protected:
 		string  get_channel_mode(Channel& channel);
-		int checkNotRegisterClient(Server& server, Client& client);
+		bool isRegisterClient(Server& server, Client& client);
 		const string makeNumericMsg(Server& server, Client& client, const string& num);
 		const string makeNumericMsg(Server& server, Client& client, const string& name, const string& num);
 		const string makeNumericMsg(Server& server, Client& client, Channel& channel, const string& num);
