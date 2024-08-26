@@ -34,7 +34,7 @@ void	INVITE::execute(Server& server, Client& client)
 		}
 		if ((*it)->getNickName() == invitee)
 		{
-			client.send(":" + server.getServername() + " 443 " + client.getNickName() + " " + invitee + " " + ch->getName() + "\r\n");
+			client.send(":" + server.getServername() + " 443 " + client.getNickName() + " " + invitee + " " + ch->getName() + " :is already on channel\r\n");
 			return;
 		}
 	}

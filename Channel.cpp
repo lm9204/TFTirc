@@ -71,6 +71,11 @@ string	Channel::getTopic() const
 	return this->_topic;
 }
 
+string	Channel::getTopicByWho() const
+{
+	return this->_topicByWho;
+}
+
 string	Channel::getPassword() const
 {
 	return this->_password;
@@ -108,9 +113,10 @@ void	Channel::setPassword(string password)
 	cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Password Successfully changed to " << password << ".\n";
 }
 
-void	Channel::setTopic(string topic)
+void	Channel::setTopic(string topic, string nick)
 {
 	this->_topic = topic;
+	this->_topicByWho = nick;
 	cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Channel topic changed to " << topic << ".\n";
 }
 

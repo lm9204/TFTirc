@@ -28,13 +28,14 @@ class Channel
 		vector<string> getInvites() const;
 		string	getName() const;
 		string	getTopic() const;
+		string	getTopicByWho() const;
 		string	getPassword() const;
 
 		int		isOper(Client* user) const;
 		int		checkUserInChannel(string nick) const;
 		void	setOper(Client* user);
 		void	setPassword(string password);
-		void	setTopic(string topic);
+		void	setTopic(string topic, string nick);
 		void	clearTopic();
 		void	removeOper(Client* user);
 		void	removePassword();
@@ -56,6 +57,7 @@ class Channel
 		string	_name;
 		string	_password;
 		string	_topic;
+		string	_topicByWho;
 
 		vector<string>	_invites;
 		vector<Client*>	_users;
