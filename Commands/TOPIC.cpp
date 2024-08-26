@@ -44,8 +44,7 @@ void	TOPIC::execute(Server& server, Client& client)
 				ch->clearTopic();
 			else
 			{
-				string topic = _cmdSource[2].erase(0, 1);
-				ch->setTopic(topic, client.who());
+				ch->setTopic(_cmdSource[2], client.who());
 			}
 
 			vector<Client*> users = ch->getUsers();
