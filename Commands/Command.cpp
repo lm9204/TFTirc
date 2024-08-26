@@ -153,11 +153,10 @@ string Command::get_channel_mode(Channel& channel)
 	return (mode);
 }
 
-
-int Command::checkNotRegisterClient(Server& server, Client& client) {
-	if (client.getNickName() == "*" || client.getUserName() == "" || client.getRealName() == "") {
+bool Command::isRegisterClient(Server& server, Client& client) {
+	if (!client.getVerifyStatus() || client.getNickName() == "*" || client.getUserName() == "" || client.getRealName() == "") {
 		client.send(makeNumericMsg(server, client, ERR_NOTREGISTERED));
-		return 1;
+		return false;
 	}
-	return 0;
+	return true;
 }

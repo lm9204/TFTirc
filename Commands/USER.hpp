@@ -14,6 +14,9 @@ class USER: public Command {
 		USER& operator=(const USER& other);
 		virtual ~USER();
 		virtual void execute(Server& server, Client& parser);
+	private:
+		bool	checkUserName(const string& userName);
+		bool	checkRealName(const string& realName);
 };
 
 #endif

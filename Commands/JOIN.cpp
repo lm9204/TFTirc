@@ -24,7 +24,7 @@ JOIN::~JOIN() {
 }
 
 void JOIN::execute(Server& server, Client& client) {
-	if (checkNotRegisterClient(server, client))
+	if (!isRegisterClient(server, client))
 		return ;
 	if (this->_cmdSource.size() < 2) {
 		client.send(makeNumericMsg(server, client, ERR_NEEDMOREPARAMS));
