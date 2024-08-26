@@ -39,7 +39,7 @@ void	Server::run()
 	change_events(_change_list, _socket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
 	//debugging
 	change_events(_change_list, STDIN_FILENO, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
-	cout << "server started\n";
+	cout << "[INFO][" << _getTimestamp() << "] Server successfully started.\n";
 
 	int new_events;
 	struct kevent*	curr_event;
