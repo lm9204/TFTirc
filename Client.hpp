@@ -35,7 +35,7 @@ class Client
 		void	setUserName(string user);
 		void	setHostName(string host);
 		void	setRealName(string real);
-		void	verified();
+		void	verify();
 
 		void	flushBuf();
 	private:

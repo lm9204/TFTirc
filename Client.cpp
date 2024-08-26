@@ -106,7 +106,7 @@ void		Client::setRealName(string real)
 	this->_real = real;
 }
 
-void		Client::verified()
+void		Client::verify()
 {
 	if (!_isVerifyed)
 		_isVerifyed = 1;
