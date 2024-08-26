@@ -14,7 +14,7 @@ Channel::Channel(string name, Client* owner) : _name(name), _inviteOnly(0), _top
 {
 	cout << "[INFO][" << _getTimestamp() << "][Channel: " << name << "] Created Successfully by " << owner->getNickName() << ".\n";
 }
-
+		
 Channel::Channel(const Channel& ref)
 {
 	*this = ref;
