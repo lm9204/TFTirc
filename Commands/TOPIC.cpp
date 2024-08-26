@@ -33,27 +33,25 @@ void	TOPIC::execute(Server& server, Client& client)
 			if (ch->getTopic().length() == 0)
 				msg += "331 " + client.getNickName() + " " + ch->getName() + " :No topic is set\r\n";
 			else
+			{
 				msg += "332 " + client.getNickName() + " " + ch->getName() + " :" + ch->getTopic() + "\r\n";
+				msg += ":" + server.getServername() + " 333 " + client.getNickName() + " " + ch->getName() + " " + ch->getTopicByWho() + " " + to_string(chrono::duration_cast<chrono::seconds>(chrono::system_clock::now().time_since_epoch()).count()) + "\r\n";
+			}
 		}
 		else
 		{
 			if (_cmdSource[2].length() == 1)
-			{
 				ch->clearTopic();
-				msg += "332 " + client.getNickName() + " " + ch->getName() + "\r\n";
-			}
 			else
 			{
 				string topic = _cmdSource[2].erase(0, 1);
-				ch->setTopic(topic);
-				msg += "332 " + client.getNickName() + " " + ch->getName() + " :" + ch->getTopic() + "\r\n";
+				ch->setTopic(topic, client.who());
 			}
 
 			vector<Client*> users = ch->getUsers();
 			for (size_t i = 0; i < users.size(); ++i)
 			{
-				users[i]->send(msg);
-				users[i]->send(":" + server.getServername() + " 333 " + users[i]->getNickName() + " " + ch->getName() + " " + client.getNickName() + " " + to_string(chrono::duration_cast<chrono::seconds>(chrono::system_clock::now().time_since_epoch()).count()) + "\r\n");
+				users[i]->send(":" + client.who() + " TOPIC " + ch->getName() + " :" + ch->getTopic() + "\r\n");
 			}
 		}
 	}
