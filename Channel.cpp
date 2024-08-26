@@ -35,6 +35,7 @@ Channel&	Channel::operator=(const Channel& ref)
 	this->_name = ref._name;
 	this->_inviteOnly = ref._inviteOnly;
 	this->_topicOpOnly = ref._topicOpOnly;
+	this->_topicByWho = ref._topicByWho;
 	this->_user_limit = ref._user_limit;
 	this->_topic = ref._topic;
 	this->_password = ref._password;
