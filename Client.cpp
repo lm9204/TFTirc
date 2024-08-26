@@ -62,7 +62,7 @@ string	Client::getRealName() const
 
 int		Client::getVerifyStatus() const
 {
-	return (_isVerifyed);
+	return (_isVerified);
 }
 
 string	Client::getBuf() const
@@ -108,8 +108,8 @@ void		Client::setRealName(string real)
 
 void		Client::verify()
 {
-	if (!_isVerifyed)
-		_isVerifyed = 1;
+	if (!_isVerified)
+		_isVerified = 1;
 	else
 		cout << "[ERROR][" << Server::_getTimestamp() << "] Client: " << _nick << " is already verified.\n";
 }

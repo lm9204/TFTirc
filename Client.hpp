@@ -46,7 +46,7 @@ class Client
 
 		string	_buf;
 		int		_fd;
-		int		_isVerifyed;
+		int		_isVerified;
 };
 
 std::ostream& operator<<(std::ostream& os, const Client& ref);
