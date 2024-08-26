@@ -22,10 +22,8 @@ USER::~USER() {
 }
 
 void USER::execute(Server& server, Client& client) {
-	if (!client.getVerifyStatus()) {
-		client.send(makeNumericMsg(server, client, ERR_NOTREGISTERED));
+	if (!isVerifyClient(server, client))
 		return ;
-	}
 	// 인자 수 체크
 	if (this->_cmdSource.size() < 5) {
 		client.send(makeNumericMsg(server, client, ERR_NEEDMOREPARAMS));
