@@ -22,6 +22,10 @@ NICK::~NICK() {
 }
 
 void NICK::execute(Server& server, Client& client) {
+	if (!client.getVerifyStatus()) {
+		client.send(makeNumericMsg(server, client, ERR_NOTREGISTERED));
+		return ;
+	}
 	// 파라미터 확인
 	if (this->_cmdSource.size() < 2) {
 		client.send(makeNumericMsg(server, client, ERR_NONICKNAMEGIVEN));

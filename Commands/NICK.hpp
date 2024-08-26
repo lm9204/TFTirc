@@ -14,6 +14,7 @@ class NICK: public Command {
 		NICK& operator=(const NICK& other);
 		virtual ~NICK();
 		virtual void execute(Server& server, Client& parser);
+	private:
 		bool	checkNickName(const string& nickName);
 };
 
