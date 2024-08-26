@@ -179,6 +179,8 @@ void	Channel::kick(Client* user)
 		cout << "[ERROR][" << _getTimestamp() << "][Channel: " << _name << "] " << user->getNickName() << " is not in the channel.\n";
 	else
 	{
+		if (isOper(user))
+			removeOper(user);
 		_users.erase(_users.begin() + idx);
 		cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] " << user->getNickName() << " kicked from the channel.\n";
 	}
