@@ -14,7 +14,7 @@ Channel::Channel(string name, Client* owner) : _name(name), _inviteOnly(0), _top
 {
 	cout << "[INFO][" << _getTimestamp() << "][Channel: " << name << "] Created Successfully by " << owner->getNickName() << ".\n";
 }
-		
+
 Channel::Channel(const Channel& ref)
 {
 	*this = ref;
@@ -115,6 +115,8 @@ void	Channel::setPassword(string password)
 
 void	Channel::setTopic(string topic, string nick)
 {
+	if (topic.find(":") == 0)
+		topic = topic.erase(0, 1);
 	this->_topic = topic;
 	this->_topicByWho = nick;
 	cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Channel topic changed to " << topic << ".\n";
@@ -135,7 +137,7 @@ void	Channel::removeOper(Client* user)
 	else
 	{
 		_operators.erase(_operators.begin() + idx);
-		cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] The operator has been removed from the " << user->getNickName() << ".\n"; 
+		cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] The operator " << user->getNickName() << " has been removed from the " << getName() << ".\n"; 
 	}
 }
 
