@@ -13,7 +13,6 @@ Channel::Channel(string empty) : _name(empty)
 Channel::Channel(string name, Client* owner) : _name(name), _inviteOnly(0), _topicOpOnly(0), _user_limit(0)
 {
 	cout << "[INFO][" << _getTimestamp() << "][Channel: " << name << "] Created Successfully by " << owner->getNickName() << ".\n";
-	setOper(owner);
 }
 
 Channel::Channel(const Channel& ref)
