@@ -13,9 +13,8 @@ Channel::Channel(string empty) : _name(empty)
 Channel::Channel(string name, Client* owner) : _name(name), _inviteOnly(0), _topicOpOnly(0), _user_limit(0)
 {
 	cout << "[INFO][" << _getTimestamp() << "][Channel: " << name << "] Created Successfully by " << owner->getNickName() << ".\n";
-	setOper(owner);
 }
-
+		
 Channel::Channel(const Channel& ref)
 {
 	*this = ref;
@@ -36,6 +35,7 @@ Channel&	Channel::operator=(const Channel& ref)
 	this->_name = ref._name;
 	this->_inviteOnly = ref._inviteOnly;
 	this->_topicOpOnly = ref._topicOpOnly;
+	this->_topicByWho = ref._topicByWho;
 	this->_user_limit = ref._user_limit;
 	this->_topic = ref._topic;
 	this->_password = ref._password;
@@ -179,6 +179,8 @@ void	Channel::kick(Client* user)
 		cout << "[ERROR][" << _getTimestamp() << "][Channel: " << _name << "] " << user->getNickName() << " is not in the channel.\n";
 	else
 	{
+		if (isOper(user))
+			removeOper(user);
 		_users.erase(_users.begin() + idx);
 		cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] " << user->getNickName() << " kicked from the channel.\n";
 	}
