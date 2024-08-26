@@ -25,6 +25,7 @@ class Client
 		string	getUserName() const;
 		string	getHostName() const;
 		string	getRealName() const;
+		int		getVerifyStatus() const;
 
 		string	getBuf() const;
 		int		getSocketFd() const;
@@ -34,6 +35,7 @@ class Client
 		void	setUserName(string user);
 		void	setHostName(string host);
 		void	setRealName(string real);
+		void	verify();
 
 		void	flushBuf();
 	private:
@@ -44,6 +46,7 @@ class Client
 
 		string	_buf;
 		int		_fd;
+		int		_isVerified;
 };
 
 std::ostream& operator<<(std::ostream& os, const Client& ref);
