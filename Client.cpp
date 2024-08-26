@@ -4,11 +4,11 @@
 #include "Client.hpp"
 #include "Server.hpp"
 
-Client::Client(int fd, string client_addr) : _nick("*"), _host(client_addr), _fd(fd), _isVerifyed(0)
+Client::Client(int fd, string client_addr) : _nick("*"), _host(client_addr), _fd(fd), _isVerified(0)
 {
 }
 
-Client::Client(const Client& ref) : _nick(ref._nick), _host(ref._host), _fd(ref._fd), _isVerifyed(ref._isVerifyed)
+Client::Client(const Client& ref) : _nick(ref._nick), _host(ref._host), _fd(ref._fd), _isVerified(ref._isVerified)
 {
 	*this = ref;
 }
@@ -24,7 +24,7 @@ Client&	Client::operator=(const Client& ref)
 	_host = ref._host;
 	_real = ref._real;
 	_buf = ref._buf;
-	_isVerifyed = ref._isVerifyed;
+	_isVerified = ref._isVerified;
 	return *this;
 }
 
