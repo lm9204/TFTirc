@@ -35,17 +35,17 @@ void JOIN::execute(Server& server, Client& client) {
 	scaleTarget();
 	vector<string>::iterator channelIt, keyIt;
 	for (channelIt = this->targetChannel.begin(), keyIt = this->targetKey.begin(); channelIt != this->targetChannel.end() && keyIt != this->targetKey.end(); channelIt++, keyIt++) {
-		this->_cmdSource[1] = *channelIt;
-		if (!checkValidChannelName(this->_cmdSource[1])) {
-			client.send(makeNumericMsg(server, client, this->_cmdSource[1], ERR_BADCHANMASK));
+		string channelName = *channelIt;
+		if (!checkValidChannelName(channelName)) {
+			client.send(makeNumericMsg(server, client, channelName, ERR_BADCHANMASK));
 			continue;
 		}
-		Channel* channel = server.getChannel(this->_cmdSource[1]);
+		Channel* channel = server.getChannel(channelName);
 		bool newChannel = false;
 		// 채널이 존재하지 않는 경우
 		if (channel == NULL) {
-			server.createChannel(this->_cmdSource[1], &client);
-			channel = server.getChannel(this->_cmdSource[1]);
+			server.createChannel(channelName, &client);
+			channel = server.getChannel(channelName);
 			channel->join(&client);
 			channel->setOper(&client);
 			newChannel = true;
@@ -55,19 +55,20 @@ void JOIN::execute(Server& server, Client& client) {
 			client.send(makeNumericMsg(server, client, *channel, ERR_BADCHANNELKEY));
 			continue;
 		}
-		// 초대 전용 모드이고 초대되지 않았을 경우
-		if (channel->getMode(Channel::INVITE_ONLY) && !channel->isInvited(client.getNickName())) {
-				client.send(makeNumericMsg(server, client, *channel, ERR_INVITEONLYCHAN));
-			continue;
-		}
 		// 유저 제한이 존재하고 제한을 넘겼을 경우
 		if (channel->getMode(Channel::USER_LIMIT) != 0 && channel->getMode(Channel::USER_LIMIT) <= static_cast<int>(channel->getUsers().size())) {
 			client.send(makeNumericMsg(server, client, *channel, ERR_CHANNELISFULL));
 			continue;
 		}
+		// 초대 전용 모드이고 초대되지 않았을 경우
+		if (channel->getMode(Channel::INVITE_ONLY) && !channel->isInvited(client.getNickName())) {
+			channel->accept(client.getNickName());
+			client.send(makeNumericMsg(server, client, *channel, ERR_INVITEONLYCHAN));
+			continue;
+		}
 		if (!newChannel)
 			channel->join(&client);
-		channel->broadcast(":" + client.getNickName() + "!~" + client.getUserName() + "@" + client.getHostName() + " " + "JOIN" + " " + this->_cmdSource[1] + "\r\n");
+		channel->broadcast(":" + client.getNickName() + "!~" + client.getUserName() + "@" + client.getHostName() + " " + "JOIN" + " " + channelName + "\r\n");
 		client.send(makeNumericMsg(server, client, *channel, RPL_TOPIC));
 		client.send(makeNumericMsg(server, client, *channel, RPL_NAMREPLY));
 		client.send(makeNumericMsg(server, client, *channel, RPL_ENDOFNAMES));

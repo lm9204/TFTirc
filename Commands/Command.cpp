@@ -153,9 +153,26 @@ string Command::get_channel_mode(Channel& channel)
 	return (mode);
 }
 
+
+/**
+ * 등록되지 않은 유저면 ERR_NOTREGISTERED 메시지를 보냄
+ * return : 등록된 유저면 true, 등록되지 않은 유저면 false
+*/
 bool Command::isRegisterClient(Server& server, Client& client) {
-	if (!client.getVerifyStatus() || client.getNickName() == "*" || client.getUserName() == "" || client.getRealName() == "") {
+	if (client.getNickName() == "*" || client.getUserName() == "" || client.getRealName() == "") {
 		client.send(makeNumericMsg(server, client, ERR_NOTREGISTERED));
+		return false;
+	}
+	return true;
+}
+
+/**
+ * 비밀번호를 인증하지 않은 유저면 서버와의 연결을 끊음
+ * return : 비밀번호를 인증한 유저면 true, 비밀번호를 인증하지 않은 유저면 false
+*/
+bool Command::isVerifyClient(Server& server, Client& client) {
+	if (!client.getVerifyStatus()) {
+		server.disconnect_client(client.getSocketFd());
 		return false;
 	}
 	return true;

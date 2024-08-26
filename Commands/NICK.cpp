@@ -22,10 +22,8 @@ NICK::~NICK() {
 }
 
 void NICK::execute(Server& server, Client& client) {
-	if (!client.getVerifyStatus()) {
-		client.send(makeNumericMsg(server, client, ERR_NOTREGISTERED));
+	if (!isVerifyClient(server, client))
 		return ;
-	}
 	// 파라미터 확인
 	if (this->_cmdSource.size() < 2) {
 		client.send(makeNumericMsg(server, client, ERR_NONICKNAMEGIVEN));
@@ -42,8 +40,10 @@ void NICK::execute(Server& server, Client& client) {
 		client.send(makeNumericMsg(server, client, ERR_NICKNAMEINUSE));
 		return ;
 	}
-	server.notify(client.getNickName(), ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
-	client.send(":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
+	if (client.getUserName() != "" && client.getRealName() != "") {
+		server.notify(client.getNickName(), ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
+		client.send(":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
+	}
 	if (client.getNickName() == "*" && client.getUserName() != "" && client.getRealName() != "") {
 		client.setNickName(this->_cmdSource[1]);
 		client.send(makeNumericMsg(server, client, RPL_WELCOME));
