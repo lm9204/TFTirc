@@ -21,12 +21,11 @@ USER::~USER() {
 
 }
 
-
-//
-//    ERR_NEEDMOREPARAMS (461)
-//    ERR_ALREADYREGISTERED (462)
-
 void USER::execute(Server& server, Client& client) {
+	if (!client.getVerifyStatus()) {
+		client.send(makeNumericMsg(server, client, ERR_NOTREGISTERED));
+		return ;
+	}
 	// 인자 수 체크
 	if (this->_cmdSource.size() < 5) {
 		client.send(makeNumericMsg(server, client, ERR_NEEDMOREPARAMS));
@@ -36,8 +35,30 @@ void USER::execute(Server& server, Client& client) {
 		client.send(makeNumericMsg(server, client, ERR_ALREADYREGISTERED));
 		return ;
 	}
-	client.setUserName(this->_cmdSource[1]);
-	client.setRealName(this->_cmdSource[4]);
+	string userName, realName;
+	userName = this->_cmdSource[1];
+	realName = this->_cmdSource[4];
+	if (!checkUserName(userName))
+		userName = client.getNickName();
+	if (!checkRealName(realName))
+		realName = client.getNickName();
+	client.setUserName(userName);
+	client.setRealName(realName);
 	if (client.getNickName() != "*")
 		client.send(makeNumericMsg(server, client, RPL_WELCOME));
+}
+
+bool	USER::checkUserName(const string& userName) {
+	for (string::const_iterator it = userName.begin() + 1; it != userName.end(); it++)
+		if (!isalnum(*it))
+			return false;
+	return true;
+}
+
+bool	USER::checkRealName(const string& realName) {
+	string allowChar(": ");
+	for (string::const_iterator it = realName.begin() + 1; it != realName.end(); it++)
+		if (!isalnum(*it) && allowChar.find(*it) == string::npos)
+			return false;
+	return true;
 }
