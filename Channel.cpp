@@ -208,7 +208,7 @@ void	Channel::broadcast(string msg, Client* except_client)
 {
 	for (vector<Client*>::const_iterator it = _users.begin(); it != _users.end(); ++it)
 	{
-		if (except_client != *it)
+		if (except_client->getNickName() != (*it)->getNickName())
 			(*it)->send(msg);
 	}
 }
