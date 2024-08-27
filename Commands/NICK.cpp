@@ -22,33 +22,45 @@ NICK::~NICK() {
 }
 
 void NICK::execute(Server& server, Client& client) {
+	string nickName;
+	string command;
+
 	if (!isVerifyClient(server, client))
 		return ;
-	// 파라미터 확인
+	// 파라미터 수 확인
 	if (this->_cmdSource.size() < 2) {
 		client.send(makeNumericMsg(server, client, ERR_NONICKNAMEGIVEN));
 		return ;
 	}
+	command = this->_cmdSource[0];
+	nickName = this->_cmdSource[1];
+	if (nickName[0] == ':')
+		nickName = nickName.substr(1, nickName.size() - 1);
+	// 닉네임이 비어있을 때
+	if (nickName.empty()) {
+		client.send(makeNumericMsg(server, client, ERR_NONICKNAMEGIVEN));
+		return ;
+	}
 	// 유효 닉네임 확인
-	if (!checkNickName(this->_cmdSource[1])) {
-		client.send(makeNumericMsg(server, client, ERR_ERRONEUSNICKNAME));
+	if (!checkNickName(nickName)) {
+		client.send(makeNumericMsg(server, client, nickName, ERR_ERRONEUSNICKNAME));
 		return ;
 	}
 	// 중복 닉네임 확인
-	Client* findClient = server.getClient(this->_cmdSource[1]);
+	Client* findClient = server.getClient(nickName);
 	if (findClient != NULL) {
-		client.send(makeNumericMsg(server, client, ERR_NICKNAMEINUSE));
+		client.send(makeNumericMsg(server, client, nickName, ERR_NICKNAMEINUSE));
 		return ;
 	}
+	// 이미 인증된 유저일 경우
 	if (client.getUserName() != "" && client.getRealName() != "") {
-		server.notify(client.getNickName(), ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
-		client.send(":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + "\r\n");
+		server.notify(":" + client.getNickName(), client.who() + " " + command + " " + nickName + "\r\n");
+		client.send(":" + client.who() + " " + command + " " + nickName + "\r\n");
 	}
-	if (client.getNickName() == "*" && client.getUserName() != "" && client.getRealName() != "") {
-		client.setNickName(this->_cmdSource[1]);
+	// 낙네임이 비어있고, 유저네임과 리얼네임이 적혀있는 경우.
+	client.setNickName(nickName);
+	if (client.getNickName() == "*" && client.getUserName() != "" && client.getRealName() != "")
 		client.send(makeNumericMsg(server, client, RPL_WELCOME));
-	} else 
-		client.setNickName(this->_cmdSource[1]);
 }
 
 /*
@@ -57,10 +69,10 @@ void NICK::execute(Server& server, Client& client) {
 - 명령어에 모호성을 주지 않는한 추가문자 허용 가능
 */
 bool	NICK::checkNickName(const string& nickName) {
-	if (isdigit(nickName[0]))
+	if (nickName.size() == 0 || isdigit(nickName[0]))
 		return false;
 	string allowChar("[]{}\\|");
-	for (string::const_iterator it = nickName.begin() + 1; it != nickName.end(); it++)
+	for (string::const_iterator it = nickName.begin(); it != nickName.end(); it++)
 		if (!isalnum(*it) && allowChar.find(*it) == string::npos)
 			return false;
 	return true;
