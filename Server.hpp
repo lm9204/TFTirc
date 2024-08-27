@@ -45,9 +45,9 @@ class Server
 
 	private:
 		//error Client(-1)
-		CommandController		_command_controller;
-		vector<Channel> _channels;
-		vector<Client>	_clients;
+		CommandController	_command_controller;
+		vector<Channel*>	_channels;
+		vector<Client*>		_clients;
 		string	_password;
 		string	_name;
 		int		_port;
