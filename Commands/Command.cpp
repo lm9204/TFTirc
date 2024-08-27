@@ -29,16 +29,11 @@ const string Command::makeNumericMsg(Server& server, Client& client, const strin
 
 	res += string(":") + server.getServername() + " " + num + " ";
 	if (num == RPL_WELCOME) {
-		// res += client.getNickName() + " :Welcome to the " + server.getHostName() + " NetWork, " + client.getNickName() + "!" + client.getUserName() + "@" + server.getHostName() + "\r\n";
-		res += client.getNickName() + " :Welcome to the " + "server" + " NetWork, " + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName();
+		res += client.getNickName() + " :Welcome to the " + server.getServername() + " NetWork, " + client.who();
 	} else if (num == ERR_NOTEXTTOSEND) {
 		res += client.getNickName() + " " + ":No text to send";
 	} else if (num == ERR_NONICKNAMEGIVEN) {
 		res += client.getNickName() + " " + ":No nickname given";
-	} else if (num == ERR_ERRONEUSNICKNAME) {
-		res += client.getNickName() + " " + this->_cmdSource[1] + " " + ":Erroneus nickname" + "\r\n";
-	} else if (num == ERR_NICKNAMEINUSE) {
-		res += client.getNickName() + " " + this->_cmdSource[1] + " " + ":Nickname is already in use" + "\r\n";
 	} else if (num == ERR_NEEDMOREPARAMS) {
 		res += client.getNickName() + " " + this->_cmdSource[0] + " " + ":Not enough parameters";
 	} else if (num == ERR_ALREADYREGISTERED) {
@@ -47,8 +42,6 @@ const string Command::makeNumericMsg(Server& server, Client& client, const strin
 		res += client.getNickName() + " " + ":You have not registered";
 	} else if (num == ERR_PASSWDMISMATCH) {
 		res += client.getNickName() + " " + ":Password incorrect";
-	} else if (num == ERR_UNKNOWNCOMMAND) {
-		res += client.getNickName() + " " + this->_cmdSource[0] + " " + ":Unknown command";
 	} else {
 		return "";
 	}
@@ -75,6 +68,12 @@ const string Command::makeNumericMsg(Server& server, Client& client, const strin
 		res += name + " " + ":Bad Channel Mask";
 	} else if (num == ERR_NOTONCHANNEL) {
 		res += client.getNickName() + " " + name + " :You're not on that channel";
+	} else if (num == ERR_ERRONEUSNICKNAME) {
+		res += client.getNickName() + " " + name + " " + ":Erroneus nickname" + "\r\n";
+	} else if (num == ERR_NICKNAMEINUSE) {
+		res += client.getNickName() + " " + name + " " + ":Nickname is already in use" + "\r\n";
+	} else if (num == ERR_UNKNOWNCOMMAND) {
+		res += client.getNickName() + " " + name + " " + ":Unknown command";
 	} else {
 		return "";
 	}
