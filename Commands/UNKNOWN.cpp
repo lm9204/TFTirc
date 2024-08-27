@@ -22,5 +22,5 @@ UNKNOWN::~UNKNOWN() {
 }
 
 void UNKNOWN::execute(Server& server, Client& client) {
-	client.send(makeNumericMsg(server, client, ERR_UNKNOWNCOMMAND));
+	client.send(makeNumericMsg(server, client, this->_cmdSource[0], ERR_UNKNOWNCOMMAND));
 }
