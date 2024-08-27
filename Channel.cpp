@@ -17,7 +17,16 @@ Channel::Channel(string name, Client* owner) : _name(name), _inviteOnly(0), _top
 
 Channel::Channel(const Channel& ref)
 {
-	*this = ref;
+	this->_name = ref._name;
+	this->_inviteOnly = ref._inviteOnly;
+	this->_topicOpOnly = ref._topicOpOnly;
+	this->_topicByWho = ref._topicByWho;
+	this->_user_limit = ref._user_limit;
+	this->_topic = ref._topic;
+	this->_password = ref._password;
+	this->_users = ref._users;  // 벡터를 통째로 복사
+	this->_operators = ref._operators;  // 벡터를 통째로 복사
+	this->_invites = ref._invites;  // 벡터를 통째로 복사
 	cout << "[INFO][" << _getTimestamp() << "][Channel: " << ref._name << "] Created Successfully inside vector.\n";
 }
 
@@ -39,10 +48,9 @@ Channel&	Channel::operator=(const Channel& ref)
 	this->_user_limit = ref._user_limit;
 	this->_topic = ref._topic;
 	this->_password = ref._password;
-	for (size_t i = 0; i < ref._users.size(); ++i)
-		this->_users.push_back(ref._users[i]);
-	for (size_t i = 0; i < ref._operators.size(); ++i)
-		this->_operators.push_back(ref._operators[i]);
+	this->_users = ref._users;
+	this->_operators = ref._operators;
+	this->_invites = ref._invites;
 	return *this;
 }
 
