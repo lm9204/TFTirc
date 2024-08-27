@@ -44,6 +44,11 @@ void	INVITE::execute(Server& server, Client& client)
 		Client* target = server.getClient(invitee);
 		if (target != NULL)
 			target->send(":" + client.who() + " INVITE " + invitee + " :" + ch_name + "\r\n");
+		else
+		{
+			client.send(makeNumericMsg(server, client, invitee, ERR_NOSUCHNICK));
+			return ;
+		}
 		ch->invite(invitee);
 		client.send(":" + server.getServername() + " 341 " + inviter + " " + invitee + " " + ch_name + "\r\n");
 		
