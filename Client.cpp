@@ -8,9 +8,15 @@ Client::Client(int fd, string client_addr) : _nick("*"), _host(client_addr), _fd
 {
 }
 
-Client::Client(const Client& ref) : _nick(ref._nick), _host(ref._host), _fd(ref._fd), _isVerified(ref._isVerified)
+Client::Client(const Client& ref)
 {
-	*this = ref;
+	_nick = ref._nick;
+	_fd = ref._fd;
+	_user = ref._user;
+	_host = ref._host;
+	_real = ref._real;
+	_buf = ref._buf;
+	_isVerified = ref._isVerified;
 }
 
 Client&	Client::operator=(const Client& ref)
@@ -30,7 +36,7 @@ Client&	Client::operator=(const Client& ref)
 
 Client::~Client()
 {
-
+	
 }
 
 string	Client::who() const
@@ -128,7 +134,7 @@ int		Client::recv()
 	{
 		if (n < 0)
 		{
-			cerr << _fd << "client read error\n";
+			cout << "[ERROR][" << Server::_getTimestamp() << "] RECV ERROR by " << _fd << "th fd.\n"; 
 			return (0);
 		}
 	}
