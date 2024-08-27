@@ -25,7 +25,10 @@ Server::Server(int port, string password) :  _command_controller(CommandControll
 
 Server::~Server()
 {
-
+	for (size_t i = 0; i < _channels.size(); ++i)
+		delete _channels[i];
+	for (size_t i = 0; i < _clients.size(); ++i)
+		delete _clients[i];
 }
 
 void	Server::run()
@@ -33,8 +36,6 @@ void	Server::run()
 	int kq;
 	if ((kq = kqueue()) == -1)
 		handle_error("kqueue error");
-
-	map<int, string>		clients;
 
 	change_events(_change_list, _socket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
 	//debugging
@@ -58,7 +59,7 @@ void	Server::run()
 		{
 			curr_event = &_event_list[i];
 
-			if (curr_event->flags & EV_ERROR)
+			if (curr_event->flags & (EV_ERROR))
 			{
 				if ((int)curr_event->ident == _socket)
 				{
@@ -71,8 +72,6 @@ void	Server::run()
 					disconnect_client(curr_event->ident);
 				}
 			}
-			else if (curr_event->flags & EV_EOF)
-				disconnect_client(curr_event->ident);
 			else if (curr_event->ident == STDIN_FILENO)
 			{
 				debugger();
@@ -80,12 +79,11 @@ void	Server::run()
 			else if (curr_event->filter == EVFILT_READ)
 			{
 				if ((int)curr_event->ident == _socket)
-				{
 					bindClient();
-				}
 				else if (getClient(curr_event->ident)->getSocketFd() != -1)
 				{
-					getClient(curr_event->ident)->recv();
+					if (!getClient(curr_event->ident)->recv())
+						disconnect_client(curr_event->ident);
 				}
 			}
 			else if (curr_event->filter == EVFILT_WRITE)
@@ -130,6 +128,13 @@ void	Server::debugger()
 			else
 				cout << "[INFO][DEBUGGER] NO SUCH CLIENT\n";
 		}
+		else if (cmd == "showallu")
+		{
+			for (vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
+			{
+				cout << (*it);
+			}
+		}
 		else
 			cout << "[INFO][DEBUGGER] UNKNOWN COMMAND\n";
 	}
@@ -147,21 +152,28 @@ void	Server::change_events(vector<struct kevent>& change_list, uintptr_t ident
 void	Server::disconnect_client(int client_fd)
 {
 	Client* cl = getClient(client_fd);
-	cout << "[INFO][" << _getTimestamp() << "] Client " << client_fd << "th fd disconnected\n";
+	if (cl == NULL)
+		return ;
 	close(client_fd);
+	cout << "[INFO][" << _getTimestamp() << "] Client Fd: " << client_fd << " disconnected\n";
 	for (size_t i = 0; i < _clients.size(); ++i)
 	{
-		if (_clients[i].getSocketFd() == client_fd)
+		if (_clients[i]->getSocketFd() == client_fd)
 		{
 			for (size_t j = 0; j < _channels.size(); ++j)
 			{
-				if (_channels[j].checkUserInChannel(cl->getNickName()))
-					_channels[j].leave(cl);
+				if (_channels[j]->checkUserInChannel(cl->getNickName()))
+				{
+					_channels[j]->leave(cl);
+					if (_channels[j]->getUsers().size() == 0)
+						deleteChannel(_channels[j]->getName());
+				}
 			}
 			_clients.erase(_clients.begin() + i);
-			return ;
+			break;
 		}
 	}
+	delete cl;
 }
 
 int		Server::bindClient()
@@ -175,7 +187,10 @@ int		Server::bindClient()
 		return (0);
 	}
 	cout << "[INFO][" << _getTimestamp() << "][ACCEPT] New client at " << so_client << "th fd\n";
-	_clients.push_back(Client(so_client, static_cast<string>(inet_ntoa(client_addr.sin_addr))));
+
+	Client*	cl = new Client(so_client, static_cast<string>(inet_ntoa(client_addr.sin_addr)));
+
+	_clients.push_back(cl);
 	fcntl(so_client, F_SETFL, O_NONBLOCK);
 
 	change_events(_change_list, so_client, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
@@ -187,8 +202,8 @@ void	Server::notify(string nick, string msg)
 {
 	for (size_t i = 0; i < _channels.size(); ++i)
 	{
-		if (_channels[i].checkUserInChannel(nick))
-			_channels[i].broadcast(msg, getClient(nick));
+		if (_channels[i]->checkUserInChannel(nick))
+			_channels[i]->broadcast(msg, getClient(nick));
 	}
 }
 
@@ -201,21 +216,25 @@ int	Server::createChannel(string ch_name, Client* owner)
 	}
 	else
 	{
-		_channels.push_back(Channel(ch_name, owner));
+		Channel* ch = new Channel(ch_name, owner);
+		_channels.push_back(ch);
 		return (1);
 	}
 }
 
 void	Server::deleteChannel(string ch_name)
 {
+	Channel*	ch = getChannel(ch_name);
 	for (size_t i = 0; i < _channels.size(); ++i)
 	{
-		if (_channels[i].getName() == ch_name)
+		if (_channels[i]->getName() == ch_name)
 		{
 			_channels.erase(_channels.begin() + i);
 			return ;
 		}
 	}
+	delete ch;
+	cout << "[INFO][" << _getTimestamp() << "][Channel: " << ch_name << "] is deleted.\n";
 }
 
 string	Server::getPassword() const
@@ -230,11 +249,11 @@ string	Server::getServername() const
 
 Client*	Server::getClient(int fd)
 {
-	vector<Client>::iterator it = _clients.begin();
+	vector<Client*>::const_iterator it = _clients.begin();
 	while (it != _clients.end())
 	{
-		if (fd == (*it).getSocketFd())
-			return &(*it);
+		if (fd == (*it)->getSocketFd())
+			return (*it);
 		it++;
 	}
 	return NULL;
@@ -242,11 +261,11 @@ Client*	Server::getClient(int fd)
 
 Client*	Server::getClient(string nick)
 {
-	vector<Client>::iterator it = _clients.begin();
-	while (it != _clients.end())	
+	vector<Client*>::const_iterator it = _clients.begin();
+	while (it != _clients.end())
 	{
-		if (nick == (*it).getNickName())
-			return &(*it);
+		if (nick == (*it)->getNickName())
+			return (*it);
 		it++;
 	}
 	return NULL;
@@ -256,8 +275,8 @@ Channel*	Server::getChannel(string ch_name)
 {
 	for (size_t i = 0; i < _channels.size(); ++i)
 	{
-		if (_channels[i].getName() == ch_name)
-			return &_channels[i];
+		if (_channels[i]->getName() == ch_name)
+			return _channels[i];
 	}
 	return NULL;
 }
