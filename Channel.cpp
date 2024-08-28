@@ -325,6 +325,7 @@ std::ostream&	operator<<(std::ostream& os, const Channel& ch)
 	os << "----------------------------------------------------\n";
 	os << "[INFO][" << ch._getTimestamp() << "][Channel: " << ch.getName() << "] Summary: \n";
 	os << "\t - Channel Mode Settings\n";
+	os << "\t\t [Password] : " << ch.getPassword() << "\n";
 	os << "\t\t [EDIT TOPIC PERMISSION] : " << (ch.getMode(ch.TOPIC_OPER_ONLY) ? "Operator" : "User") << "\n";
 	os << "\t\t [INVITE ONLY] : " << (ch.getMode(ch.INVITE_ONLY) ? "true" : "false") << "\n";
 	os << "\t\t [USER LIMIT] : " << ch.getMode(ch.USER_LIMIT) << "\n";
