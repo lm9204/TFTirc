@@ -52,6 +52,8 @@ void	KICK::execute(Server& server, Client& client)
 		}
 		ch->broadcast(":" + client.who() + " KICK " + ch_name + " " +  (*it).nick + " :" + (*it).reason + "\r\n");
 		ch->kick(server.getClient((*it).nick));
+		if (ch->getUsers().size() == 0)
+			server.deleteChannel(ch->getName());
 	}
 }
 

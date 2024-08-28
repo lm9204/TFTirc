@@ -1,8 +1,5 @@
 #include "TOPIC.hpp"
 
-#include <chrono>
-#include <iostream>
-
 TOPIC::TOPIC() {}
 TOPIC::TOPIC(const TOPIC& ref) { *this = ref; }
 TOPIC::~TOPIC() {}
@@ -35,7 +32,7 @@ void	TOPIC::execute(Server& server, Client& client)
 			else
 			{
 				msg += "332 " + client.getNickName() + " " + ch->getName() + " :" + ch->getTopic() + "\r\n";
-				msg += ":" + server.getServername() + " 333 " + client.getNickName() + " " + ch->getName() + " " + ch->getTopicByWho() + " " + to_string(chrono::duration_cast<chrono::seconds>(chrono::system_clock::now().time_since_epoch()).count()) + "\r\n";
+				msg += ":" + server.getServername() + " 333 " + client.getNickName() + " " + ch->getName() + " " + ch->getTopicByWho() + " " + ch->getTopicChangedTime() + "\r\n";
 			}
 		}
 		else
