@@ -54,7 +54,7 @@ void NICK::execute(Server& server, Client& client) {
 	}
 	// 이미 인증된 유저일 경우
 	if (client.getUserName() != "" && client.getRealName() != "") {
-		server.notify(":" + client.getNickName(), ":" + client.who() + " " + command + " " + nickName + "\r\n");
+		server.notify(client.getNickName(), ":" + client.who() + " " + command + " " + nickName + "\r\n");
 		client.send(":" + client.who() + " " + command + " " + nickName + "\r\n");
 	}
 	// NICK 명령어에서 웰컴 메시지를 보내야 할 때.
