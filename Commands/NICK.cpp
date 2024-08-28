@@ -74,7 +74,7 @@ void NICK::execute(Server& server, Client& client) {
 bool	NICK::checkNickName(const string& nickName) {
 	if (nickName.size() == 0 || isdigit(nickName[0]))
 		return false;
-	string allowChar("[]{}\\|");
+	string allowChar("[]{}\\|_");
 	for (string::const_iterator it = nickName.begin(); it != nickName.end(); it++)
 		if (!isalnum(*it) && allowChar.find(*it) == string::npos)
 			return false;
