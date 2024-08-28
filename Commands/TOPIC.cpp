@@ -9,6 +9,8 @@ TOPIC::~TOPIC() {}
 
 void	TOPIC::execute(Server& server, Client& client)
 {
+	if (!isRegisterClient(server, client))
+		return ;
 	string msg = ":" + server.getServername() + " ";
 	Channel* ch = server.getChannel(_cmdSource[1]);
 	if (ch == NULL)

@@ -22,6 +22,8 @@ PRIVMSG::~PRIVMSG() {
 }
 
 void PRIVMSG::execute(Server& server, Client& client) {
+	if (!isRegisterClient(server, client))
+		return ;
 	if (this->_cmdSource.size() < 3) {
 		client.send(makeNumericMsg(server, client, ERR_NEEDMOREPARAMS));
 		return ;
