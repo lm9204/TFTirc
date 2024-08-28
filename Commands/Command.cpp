@@ -69,9 +69,9 @@ const string Command::makeNumericMsg(Server& server, Client& client, const strin
 	} else if (num == ERR_NOTONCHANNEL) {
 		res += client.getNickName() + " " + name + " :You're not on that channel";
 	} else if (num == ERR_ERRONEUSNICKNAME) {
-		res += client.getNickName() + " " + name + " " + ":Erroneus nickname" + "\r\n";
+		res += client.getNickName() + " " + name + " " + ":Erroneus nickname";
 	} else if (num == ERR_NICKNAMEINUSE) {
-		res += client.getNickName() + " " + name + " " + ":Nickname is already in use" + "\r\n";
+		res += client.getNickName() + " " + name + " " + ":Nickname is already in use";
 	} else if (num == ERR_UNKNOWNCOMMAND) {
 		res += client.getNickName() + " " + name + " " + ":Unknown command";
 	} else {

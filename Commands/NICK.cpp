@@ -54,13 +54,16 @@ void NICK::execute(Server& server, Client& client) {
 	}
 	// 이미 인증된 유저일 경우
 	if (client.getUserName() != "" && client.getRealName() != "") {
-		server.notify(":" + client.getNickName(), client.who() + " " + command + " " + nickName + "\r\n");
+		server.notify(client.getNickName(), ":" + client.who() + " " + command + " " + nickName + "\r\n");
 		client.send(":" + client.who() + " " + command + " " + nickName + "\r\n");
 	}
-	// 낙네임이 비어있고, 유저네임과 리얼네임이 적혀있는 경우.
-	client.setNickName(nickName);
-	if (client.getNickName() == "*" && client.getUserName() != "" && client.getRealName() != "")
+	// NICK 명령어에서 웰컴 메시지를 보내야 할 때.
+	if (client.getNickName() == "*" && client.getUserName() != "" && client.getRealName() != "") {
+		client.setNickName(nickName);
 		client.send(makeNumericMsg(server, client, RPL_WELCOME));
+		return ;
+	}
+	client.setNickName(nickName);
 }
 
 /*
@@ -71,7 +74,7 @@ void NICK::execute(Server& server, Client& client) {
 bool	NICK::checkNickName(const string& nickName) {
 	if (nickName.size() == 0 || isdigit(nickName[0]))
 		return false;
-	string allowChar("[]{}\\|");
+	string allowChar("[]{}\\|_");
 	for (string::const_iterator it = nickName.begin(); it != nickName.end(); it++)
 		if (!isalnum(*it) && allowChar.find(*it) == string::npos)
 			return false;
