@@ -20,7 +20,8 @@ SRCS =	main.cpp \
 		Commands/TOPIC.cpp \
 		Commands/KICK.cpp \
 		Commands/INVITE.cpp \
-		Commands/PART.cpp 
+		Commands/PART.cpp \
+		Commands/QUIT.cpp 
 
 OBJS = $(SRCS:.cpp=.o)
 NAME = ircserv
