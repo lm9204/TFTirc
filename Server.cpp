@@ -59,7 +59,7 @@ void	Server::run()
 		{
 			curr_event = &_event_list[i];
 
-			if (curr_event->flags & (EV_ERROR))
+			if (curr_event->flags & EV_ERROR)
 			{
 				if ((int)curr_event->ident == _socket)
 				{
@@ -73,18 +73,14 @@ void	Server::run()
 				}
 			}
 			else if (curr_event->ident == STDIN_FILENO)
-			{
 				debugger();
-			}
 			else if (curr_event->filter == EVFILT_READ)
 			{
 				if ((int)curr_event->ident == _socket)
 					bindClient();
-				else if (getClient(curr_event->ident)->getSocketFd() != -1)
-				{
-					if (!getClient(curr_event->ident)->recv())
+				else if (getClient(curr_event->ident) != NULL)
+					if (!getClient(curr_event->ident)->recv() || curr_event->flags & EV_EOF)
 						disconnect_client(curr_event->ident);
-				}
 			}
 			else if (curr_event->filter == EVFILT_WRITE)
 			{
