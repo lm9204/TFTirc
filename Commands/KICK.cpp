@@ -28,9 +28,16 @@ KICK&	KICK::operator=(const KICK& ref)
 
 void	KICK::execute(Server& server, Client& client)
 {
-	string	ch_name = this->_cmdSource[1];
-	vector<s_msg> msgs = splitMsg(this->_cmdSource[2], this->_cmdSource[3]);
+	string			ch_name;
+	vector<s_msg>	msgs;
 	
+	if (this->_cmdSource.size() < 3)
+	{
+		client.send(makeNumericMsg(server, client, ERR_NEEDMOREPARAMS));
+		return;
+	}
+	ch_name = this->_cmdSource[1];
+	msgs = splitMsg(this->_cmdSource[2], (this->_cmdSource.size() > 3) ? this->_cmdSource[3] : "");
 	Channel* ch = server.getChannel(ch_name);
 	if (ch == NULL)
 	{
@@ -42,7 +49,6 @@ void	KICK::execute(Server& server, Client& client)
 		client.send(makeNumericMsg(server, client, ch_name, "482"));
 		return ;
 	}
-
 	for (vector<s_msg>::iterator it = msgs.begin(); it != msgs.end(); ++it)
 	{
 		if (server.getClient((*it).nick) == NULL)
