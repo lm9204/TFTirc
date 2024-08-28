@@ -10,6 +10,7 @@
 #include "TOPIC.hpp"
 #include "INVITE.hpp"
 #include "PART.hpp"
+#include "QUIT.hpp"
 #include "UNKNOWN.hpp"
 #include <sstream>
 #include <iostream>
@@ -26,6 +27,7 @@ CommandController::CommandController() {
 	this->_commands["INVITE"] = new INVITE();
 	this->_commands["TOPIC"] = new TOPIC();
 	this->_commands["PART"] = new PART();
+	this->_commands["QUIT"] = new QUIT();
 	this->_commands["UNKNOWN"] = new UNKNOWN();
 }
 
