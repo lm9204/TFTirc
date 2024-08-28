@@ -226,7 +226,7 @@ void	Server::deleteChannel(string ch_name)
 		if (_channels[i]->getName() == ch_name)
 		{
 			_channels.erase(_channels.begin() + i);
-			return ;
+			break ;
 		}
 	}
 	delete ch;
