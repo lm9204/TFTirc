@@ -29,6 +29,7 @@ class Channel
 		string	getName() const;
 		string	getTopic() const;
 		string	getTopicByWho() const;
+		string	getTopicChangedTime() const;
 		string	getPassword() const;
 
 		int		isOper(Client* user) const;
@@ -58,6 +59,7 @@ class Channel
 		string	_password;
 		string	_topic;
 		string	_topicByWho;
+		string	_topicChangedTime;
 
 		vector<string>	_invites;
 		vector<Client*>	_users;

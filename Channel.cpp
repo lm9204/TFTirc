@@ -84,6 +84,11 @@ string	Channel::getTopicByWho() const
 	return this->_topicByWho;
 }
 
+string	Channel::getTopicChangedTime() const
+{
+	return this->_topicChangedTime;
+}
+
 string	Channel::getPassword() const
 {
 	return this->_password;
@@ -127,6 +132,7 @@ void	Channel::setTopic(string topic, string nick)
 		topic = topic.erase(0, 1);
 	this->_topic = topic;
 	this->_topicByWho = nick;
+	this->_topicChangedTime = to_string(chrono::duration_cast<chrono::seconds>(chrono::system_clock::now().time_since_epoch()).count());
 	cout << "[INFO][" << _getTimestamp() << "][Channel: " << _name << "] Channel topic changed to " << topic << ".\n";
 }
 
