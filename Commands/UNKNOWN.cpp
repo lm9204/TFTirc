@@ -22,5 +22,7 @@ UNKNOWN::~UNKNOWN() {
 }
 
 void UNKNOWN::execute(Server& server, Client& client) {
+	if (!isRegisterClient(server, client))
+		return ;
 	client.send(makeNumericMsg(server, client, this->_cmdSource[0], ERR_UNKNOWNCOMMAND));
 }

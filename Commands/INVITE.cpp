@@ -5,6 +5,8 @@ INVITE::~INVITE() {}
 
 void	INVITE::execute(Server& server, Client& client)
 {
+	if (!isRegisterClient(server, client))
+		return ;
 	if (_cmdSource.size() < 3)
 	{
 		client.send(makeNumericMsg(server, client, "461"));

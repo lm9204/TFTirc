@@ -8,6 +8,8 @@ PART::~PART() {}
 
 void	PART::execute(Server& server, Client& client)
 {
+	if (!isRegisterClient(server, client))
+		return ;
 	if (_cmdSource.size() < 2)
 	{
 		client.send(makeNumericMsg(server, client, "461"));
