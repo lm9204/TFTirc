@@ -34,9 +34,6 @@ void	KICK::execute(Server& server, Client& client)
 
 	if (!isRegisterClient(server, client))
 		return ;
-	string	ch_name = this->_cmdSource[1];
-	vector<s_msg> msgs = splitMsg(this->_cmdSource[2], this->_cmdSource[3]);
-	
 	if (this->_cmdSource.size() < 3)
 	{
 		client.send(makeNumericMsg(server, client, ERR_NEEDMOREPARAMS));
