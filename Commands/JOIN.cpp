@@ -65,7 +65,7 @@ void JOIN::execute(Server& server, Client& client) {
 			client.send(makeNumericMsg(server, client, *channel, ERR_INVITEONLYCHAN));
 			continue;
 		} else if (channel->getMode(Channel::INVITE_ONLY) && channel->isInvited(client.getNickName()))
-			channel->accept(client.getNickName());
+			channel->accept(&client);
 
 		if (!newChannel)
 			channel->join(&client);
