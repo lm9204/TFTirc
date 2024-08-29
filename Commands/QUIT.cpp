@@ -24,6 +24,8 @@ QUIT::~QUIT() {
 void QUIT::execute(Server& server, Client& client) {
 	string command;
 
+	if (!isRegisterClient(server, client))
+		return ;
 	command = this->_cmdSource[0];
 	server.notify(client.getNickName(), ":" + client.who() + " " + command + " " + ":Client Quit" + "\r\n");
 	client.send(":" + client.who() + " " + command + " " + ":Client Quit" + "\r\n");

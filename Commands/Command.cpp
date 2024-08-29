@@ -158,7 +158,7 @@ string Command::get_channel_mode(Channel& channel)
  * return : 등록된 유저면 true, 등록되지 않은 유저면 false
 */
 bool Command::isRegisterClient(Server& server, Client& client) {
-	if (client.getNickName() == "*" || client.getUserName() == "" || client.getRealName() == "") {
+	if (!client.getVerifyStatus() || client.getNickName() == "*" || client.getUserName() == "" || client.getRealName() == "") {
 		client.send(makeNumericMsg(server, client, ERR_NOTREGISTERED));
 		return false;
 	}

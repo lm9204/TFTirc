@@ -110,6 +110,8 @@ void	MODE::execute(Server& server, Client& client)
 	int		cmd_idx = 3;
 	char	opt;
 
+	if (!isRegisterClient(server, client))
+		return ;
 	if (_cmdSource[1][0] != '#')
 	{
 		client.send(":" + client.getHostName() + " 221 " + _cmdSource[1] + " " + _cmdSource[2] + "\r\n");
