@@ -25,7 +25,7 @@ class Channel
 		
 		vector<Client*>	getUsers() const;
 		vector<Client*>	getOper() const;
-		vector<string> getInvites() const;
+		vector<Client*> getInvites() const;
 		string	getName() const;
 		string	getTopic() const;
 		string	getTopicByWho() const;
@@ -45,8 +45,8 @@ class Channel
 		void	kick(Client* user);
 		void	broadcast(string msg);
 		void	broadcast(string msg, Client* except_client);
-		void	invite(string nick);
-		void	accept(string nick);
+		void	invite(Client* user);
+		void	accept(Client* user);
 		int		isInvited(string nick);
 
 		int		getMode(CHANNEL_OPT type) const;
@@ -61,7 +61,7 @@ class Channel
 		string	_topicByWho;
 		string	_topicChangedTime;
 
-		vector<string>	_invites;
+		vector<Client*>	_invites;
 		vector<Client*>	_users;
 		vector<Client*>	_operators;
 
