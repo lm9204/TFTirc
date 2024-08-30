@@ -39,7 +39,7 @@ void	TOPIC::execute(Server& server, Client& client)
 		}
 		else
 		{
-			if (_cmdSource[2].length() == 1)
+			if (_cmdSource[2].length() == 0)
 				ch->clearTopic();
 			else
 			{

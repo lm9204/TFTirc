@@ -9,7 +9,7 @@
 Server::Server(int port, string password) :  _command_controller(CommandController()), _password(password), _name(HOST), _port(port), _socket(-1)
 {
 	if ((_socket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
-		handle_error("socket error");
+		handle_error("Server Socket error");
 
 	memset(&_server_addr, 0, sizeof(_server_addr));
 	_server_addr.sin_family = AF_INET;
@@ -17,18 +17,23 @@ Server::Server(int port, string password) :  _command_controller(CommandControll
 	_server_addr.sin_port = htons(_port);
 
 	if (bind(_socket, (sockaddr*)&_server_addr, sizeof(_server_addr)) == -1)
-		handle_error("bind error");
+		handle_error("Server Bind error");
 	
 	if (listen(_socket, 5) == -1)
-		handle_error("listen error");
+		handle_error("Server Listen error");
 }
 
 Server::~Server()
 {
+	cout << "[INFO][" << _getTimestamp() << "] Server cleaning all Channels...\n";
 	for (size_t i = 0; i < _channels.size(); ++i)
 		delete _channels[i];
+	cout << "[INFO][" << _getTimestamp() << "] Server Successfully delete all Channels.\n";
+	cout << "[INFO][" << _getTimestamp() << "] Server cleaning all Users...\n";
 	for (size_t i = 0; i < _clients.size(); ++i)
 		delete _clients[i];
+	cout << "[INFO][" << _getTimestamp() << "] Server Successfully delete all Users.\n";
+	cout << "[INFO][" << _getTimestamp() << "] Server Successfully Closed.\n";
 }
 
 void	Server::run()
@@ -36,13 +41,14 @@ void	Server::run()
 	int kq;
 
 	if ((kq = kqueue()) == -1)
-		handle_error("kqueue error");
+		handle_error("Server Kqueue init error");
+
 	this->_clients.push_back(new Bot(this));
 	//bot client add
 	change_events(_change_list, _socket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
 	//debugging
 	change_events(_change_list, STDIN_FILENO, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
-	cout << "[INFO][" << _getTimestamp() << "] Server successfully started.\n";
+	cout << "[INFO][" << _getTimestamp() << "] Server Successfully started.\n";
 
 	int new_events;
 	struct kevent*	curr_event;
@@ -51,10 +57,7 @@ void	Server::run()
 	{
 		new_events = kevent(kq, &_change_list[0], _change_list.size(), _event_list, 8, NULL);
 		if (new_events == -1)
-		{
-			cerr << "kevent error\n";
-			exit(1);
-		}
+			handle_error("Kqueue Event Error");
 
 		_change_list.clear();
 		for (int i = 0; i < new_events; ++i)
@@ -64,13 +67,10 @@ void	Server::run()
 			if (curr_event->flags & EV_ERROR)
 			{
 				if ((int)curr_event->ident == _socket)
-				{
-					cerr << "server socket error\n";
-					exit(1);
-				}
+					handle_error("Server Socket Error");
 				else
 				{
-					cerr << "client socket error\n";
+					cerr << "[ERROR][" << _getTimestamp() << "] Client socket error.\n";
 					disconnect_client(curr_event->ident);
 				}
 			}
@@ -183,10 +183,10 @@ int		Server::bindClient()
 	int so_client;
 	if ((so_client = accept(_socket, (struct sockaddr*)&client_addr, &client_len)) == -1)
 	{
-		cerr << "accept error\n";
+		cerr << "[ERROR][" << _getTimestamp() << "] Client Bind(Accept) error. Failed to bind new Client.\n";
 		return (0);
 	}
-	cout << "[INFO][" << _getTimestamp() << "][ACCEPT] New client at " << so_client << "th fd\n";
+	cout << "[INFO][" << _getTimestamp() << "][ACCEPT] New Client at " << so_client << "th fd\n";
 
 	Client*	cl = new Client(so_client, static_cast<string>(inet_ntoa(client_addr.sin_addr)));
 
@@ -211,7 +211,7 @@ int	Server::createChannel(string ch_name, Client* owner)
 {
 	if (getChannel(ch_name) != NULL)
 	{
-		cout << "[ERROR] Channel " << ch_name << " is already exist.\n";
+		cout << "[ERROR][" << _getTimestamp() << "] Channel " << ch_name << " is already exist.\n";
 		return (0);
 	}
 	else
@@ -225,6 +225,11 @@ int	Server::createChannel(string ch_name, Client* owner)
 void	Server::deleteChannel(string ch_name)
 {
 	Channel*	ch = getChannel(ch_name);
+	if (ch == nullptr)
+	{
+		cout << "[ERROR][" << _getTimestamp() << "] " << ch_name << " Channel is not exist.\n";
+		return ;
+	}
 	for (size_t i = 0; i < _channels.size(); ++i)
 	{
 		if (_channels[i]->getName() == ch_name)
@@ -234,7 +239,6 @@ void	Server::deleteChannel(string ch_name)
 		}
 	}
 	delete ch;
-	cout << "[INFO][" << _getTimestamp() << "][Channel: " << ch_name << "] is deleted.\n";
 }
 
 string	Server::getPassword() const
@@ -282,9 +286,9 @@ Channel*	Server::getChannel(string ch_name)
 }
 
 // test error -> exception
-void	handle_error(string err)
+void	Server::handle_error(string err)
 {
-	cerr << err << "\n";
+	cerr << "[ERROR][" << _getTimestamp() << "] " << err << "\n";
 	exit(1);
 }
 
