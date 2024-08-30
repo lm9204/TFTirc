@@ -12,32 +12,32 @@ MODE& MODE::operator=(const MODE& other) {
 	return *this;
 }
 
-void	MODE::do_command(Server& server, std::string name)
+void	MODE::do_command(Server& server, Channel *channel)
 {
 	if (_mode == FLAG_I)
-		server.getChannel(name)->setMode(Channel::INVITE_ONLY, _flag);
+		channel->setMode(Channel::INVITE_ONLY, _flag);
 	else if (_mode == FLAG_T)
-		server.getChannel(name)->setMode(Channel::TOPIC_OPER_ONLY, _flag);
+		channel->setMode(Channel::TOPIC_OPER_ONLY, _flag);
 	else if (_mode == FLAG_O)
 	{
 		if (_flag == true)
-			server.getChannel(name)->setOper(server.getClient(_key));
+			channel->setOper(server.getClient(_key));
 		else
-			server.getChannel(name)->removeOper(server.getClient(_key));
+			channel->removeOper(server.getClient(_key));
 	}
 	else if (_mode == FLAG_K)
 	{
 		if (_flag == true)
-			server.getChannel(name)->setPassword(_key);
+			channel->setPassword(_key);
 		else
-			server.getChannel(name)->removePassword();
+			channel->removePassword();
 	}
 	else if (_mode == FLAG_L)
 	{
 		if (_flag == true)
-			server.getChannel(name)->setMode(Channel::USER_LIMIT, _limit);
+			channel->setMode(Channel::USER_LIMIT, _limit);
 		else
-			server.getChannel(name)->setMode(Channel::USER_LIMIT, 0);
+			channel->setMode(Channel::USER_LIMIT, 0);
 	}
 }
 
@@ -84,12 +84,12 @@ int	MODE::check_cmd(Server& server, Channel	&channel, Client& client)
 	}
 	if (_mode == FLAG_O)
 	{
-		temp = server.getClient(_key);
-		if (temp == NULL)
+		if (channel.checkUserInChannel(_key) == 0)
 		{
 			client.send(makeNumericMsg(server, client, "401"));
 			return (false);
 		}
+		temp = server.getClient(_key);
 		if (_flag == true && channel.isOper(temp) == true)
 			return (false);
 		if (_flag == false && channel.isOper(temp) == false)
@@ -226,14 +226,14 @@ void	MODE::execute(Server& server, Client& client)
 		{
 			_mode = FLAG_O;
 			// -o일 때 처리가 안되어있음
-			// if (_flag == true)
-			// {
+			if (_flag == true)
+			{
 				if (cmd_idx < static_cast<int>(_cmdSource.size()))
 					_key = _cmdSource[cmd_idx];
 				else
 					continue;
 				cmd_idx++;
-			// }
+			}
 		}
 		else
 		{
@@ -244,7 +244,7 @@ void	MODE::execute(Server& server, Client& client)
 		if (_flag != -1 && check_cmd(server, *channel, client) == true)
 		{
 			respond += opt;
-			do_command(server, name);
+			do_command(server, channel);
 			if ((_mode == FLAG_K && _flag == true) || (_mode == FLAG_L && _flag == true) || (_mode == FLAG_O))
 			{
 				if (respond_arg != "")
