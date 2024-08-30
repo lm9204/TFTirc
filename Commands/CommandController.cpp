@@ -47,9 +47,12 @@ vector<string> CommandController::cmdSplit(string cmd) {
 
 	try {
 		beforeColon = cmd.substr(0, cmd.find(":", 0));
-		afterColon = cmd.substr(cmd.find(":", 0) + 1);
+		afterColon = cmd.substr(cmd.find(":", 0));
+		afterColon = afterColon.substr(1, afterColon.size() - 1);
 		iss.str(beforeColon);
 	} catch (exception& e) {
+		beforeColon = "";
+		afterColon = "";
 		iss.str(cmd);
 	}
 	while (!iss.eof()) {
