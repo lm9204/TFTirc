@@ -34,10 +34,11 @@ Server::~Server()
 void	Server::run()
 {
 	int kq;
+
 	if ((kq = kqueue()) == -1)
 		handle_error("kqueue error");
-
 	this->_clients.push_back(new Bot(this));
+	//bot client add
 	change_events(_change_list, _socket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
 	//debugging
 	change_events(_change_list, STDIN_FILENO, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
