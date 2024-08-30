@@ -26,6 +26,7 @@ class Channel
 		vector<Client*>	getUsers() const;
 		vector<Client*>	getOper() const;
 		vector<Client*> getInvites() const;
+		Client*	getClient(string nick) const;
 		string	getName() const;
 		string	getTopic() const;
 		string	getTopicByWho() const;
