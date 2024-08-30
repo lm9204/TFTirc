@@ -117,7 +117,7 @@ void JOIN::scaleTarget() {
 
 bool JOIN::checkValidChannelName(const string& name) {
 	string invalidChar("\x20\x07\x2C");
-	if (name[0] != '#')
+	if (name.empty() || name[0] != '#')
 		return false;
 	for (string::const_iterator it = name.begin(); it != name.end(); it++)
 		if (invalidChar.find(*it) != string::npos)
