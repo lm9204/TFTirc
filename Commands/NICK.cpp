@@ -34,8 +34,6 @@ void NICK::execute(Server& server, Client& client) {
 	}
 	command = this->_cmdSource[0];
 	nickName = this->_cmdSource[1];
-	if (nickName[0] == ':')
-		nickName = nickName.substr(1, nickName.size() - 1);
 	// 닉네임이 비어있을 때
 	if (nickName.empty()) {
 		client.send(makeNumericMsg(server, client, ERR_NONICKNAMEGIVEN));
