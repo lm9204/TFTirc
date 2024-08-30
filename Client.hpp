@@ -14,12 +14,12 @@ class Client
 		Client(int fd, string client_addr);
 		Client(const Client& ref);
 		Client& operator=(const Client& ref);
-		~Client();
+		virtual ~Client();
 
 		vector<string>	split(string line, char delim);
 		string	who() const;		//nick!nick@host.com
 		int		recv();
-		int		send(const string& msg) const;
+		virtual int		send(const string& msg) const;
 
 		string	getNickName() const;
 		string	getUserName() const;
