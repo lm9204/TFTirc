@@ -27,7 +27,7 @@ class MODE : public Command
 		virtual ~MODE();
 		virtual void	execute(Server& server, Client& client);
 		int		check_cmd(Server& server, Channel	&channel, Client& client);
-		void	do_command(Server& server, Channel *channel);
+		void	do_command(Channel *channel);
 		int		check_client_oper(vector<Client*> cli_list, Client client);
 };
 

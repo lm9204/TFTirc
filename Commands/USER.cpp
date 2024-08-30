@@ -42,8 +42,12 @@ void USER::execute(Server& server, Client& client) {
 		realName = client.getNickName();
 	client.setUserName(userName);
 	client.setRealName(realName);
-	if (client.getNickName() != "*")
+	if (client.getNickName() != "*") {
 		client.send(makeNumericMsg(server, client, RPL_WELCOME));
+		Client* bot = server.getClient(BOT_NAME);
+		if (bot != NULL)
+			client.send(":" + bot->who() + " " + "PRIVMSG" + " " + client.getNickName() + " " + ":저는 럭키비키니시티봇 입니다~~🍀" + "\r\n");
+	}
 }
 
 bool	USER::checkUserName(const string& userName) {

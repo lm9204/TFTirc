@@ -69,6 +69,16 @@ vector<Client*>	Channel::getInvites() const
 	return this->_invites;
 }
 
+Client*	Channel::getClient(string nick) const
+{
+	for (size_t i = 0; i < _users.size(); ++i)
+	{
+		if (_users[i]->getNickName() == nick)
+			return _users[i];
+	}
+	return (nullptr);
+}
+
 string	Channel::getName() const
 {
 	return this->_name;

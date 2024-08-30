@@ -12,7 +12,7 @@ MODE& MODE::operator=(const MODE& other) {
 	return *this;
 }
 
-void	MODE::do_command(Server& server, Channel *channel)
+void	MODE::do_command(Channel *channel)
 {
 	if (_mode == FLAG_I)
 		channel->setMode(Channel::INVITE_ONLY, _flag);
@@ -21,9 +21,9 @@ void	MODE::do_command(Server& server, Channel *channel)
 	else if (_mode == FLAG_O)
 	{
 		if (_flag == true)
-			channel->setOper(server.getClient(_key));
+			channel->setOper(channel->getClient(_key));
 		else
-			channel->removeOper(server.getClient(_key));
+			channel->removeOper(channel->getClient(_key));
 	}
 	else if (_mode == FLAG_K)
 	{
@@ -225,15 +225,11 @@ void	MODE::execute(Server& server, Client& client)
 		else if (opt == 'o')
 		{
 			_mode = FLAG_O;
-			// -o일 때 처리가 안되어있음
-			if (_flag == true)
-			{
-				if (cmd_idx < static_cast<int>(_cmdSource.size()))
-					_key = _cmdSource[cmd_idx];
-				else
-					continue;
-				cmd_idx++;
-			}
+			if (cmd_idx < static_cast<int>(_cmdSource.size()))
+				_key = _cmdSource[cmd_idx];
+			else
+				continue;
+			cmd_idx++;
 		}
 		else
 		{
@@ -244,7 +240,7 @@ void	MODE::execute(Server& server, Client& client)
 		if (_flag != -1 && check_cmd(server, *channel, client) == true)
 		{
 			respond += opt;
-			do_command(server, channel);
+			do_command(channel);
 			if ((_mode == FLAG_K && _flag == true) || (_mode == FLAG_L && _flag == true) || (_mode == FLAG_O))
 			{
 				if (respond_arg != "")

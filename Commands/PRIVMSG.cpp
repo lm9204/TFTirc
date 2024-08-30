@@ -36,14 +36,14 @@ void PRIVMSG::execute(Server& server, Client& client) {
 			if (targetClient == NULL) {
 				client.send(makeNumericMsg(server, client, this->_cmdSource[1], ERR_NOSUCHNICK));
 			} else {
-				targetClient->send(":" + client.getNickName() + "!~" + client.getUserName() + "@" + client.getHostName() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + " " + this->_cmdSource[2] + "\r\n");
+				targetClient->send(":" + client.who() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + " " + this->_cmdSource[2] + "\r\n");
 			}
 		} else if (this->_cmdSource[1][0] == '#') {
 			Channel* targetChannel = server.getChannel(this->_cmdSource[1]);
 			if (targetChannel == NULL) {
 				client.send(makeNumericMsg(server, client, this->_cmdSource[1], ERR_CANNOTSENDTOCHAN));
 			} else {
-				targetChannel->broadcast(":" + client.getNickName() + "!~" + client.getUserName() + "@" + client.getHostName() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + " " + this->_cmdSource[2] + "\r\n", &client);
+				targetChannel->broadcast(":" + client.who() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + " " + this->_cmdSource[2] + "\r\n", &client);
 			}
 		}
 	}
