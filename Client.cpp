@@ -138,10 +138,9 @@ int		Client::recv()
 	else
 	{
 		buf[n] = 0;
-		cout << "[INFO][" << Server::_getTimestamp() << "] RECV1: " << buf << " by " << _fd << "th fd.\n"; 
 		_buf += buf;
 		buf[n - 2] = 0;
-		cout << "[INFO][" << Server::_getTimestamp() << "] RECV2: " << buf << " by " << _fd << "th fd.\n"; 
+		cout << "[INFO][" << Server::_getTimestamp() << "] RECV: " << buf << " by " << _fd << "th fd.\n"; 
 	}
 	return (1);
 }
@@ -154,6 +153,7 @@ int		Client::send(const string& msg) const
 		cerr << "client write error\n";
 		return (0);
 	}
+	cout << "[INFO][" << Server::_getTimestamp() << "] SNED: " << msg.substr(0, msg.size() - 2) << " by " << _fd << "th fd.\n"; 
 	return (1);
 }
 
