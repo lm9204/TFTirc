@@ -44,10 +44,18 @@ vector<string> CommandController::cmdSplit(string cmd) {
 	string beforeColon;
 	string afterColon;
 	string tmp;
-	size_t colon_pos;
+	size_t colon_pos = 0;
+	bool flag = false;
 
-	colon_pos = cmd.find(":", 0);
-	if (colon_pos != string::npos) {
+	for (colon_pos = 0; colon_pos < cmd.size(); colon_pos++) {
+		if (!flag && cmd[colon_pos] == ':')
+			break ;
+		if (cmd[colon_pos] == '#')
+			flag = true;
+		if (cmd[colon_pos] == ' ')
+			flag = false;
+	}
+	if (colon_pos < cmd.size()) {
 		beforeColon = cmd.substr(0, colon_pos);
 		afterColon = cmd.substr(colon_pos);
 		afterColon = afterColon.substr(1);
@@ -55,12 +63,13 @@ vector<string> CommandController::cmdSplit(string cmd) {
 	} else
 		iss.str(cmd);
 	while (!iss.eof()) {
+		// getline(iss, tmp, ' ');
 		iss >> tmp;
 		if (tmp != "")
 			res.push_back(tmp);
 		tmp = "";
 	}
-	if (colon_pos != string::npos)
+	if (colon_pos != cmd.size())
 		res.push_back(afterColon);
 	return res;
 }
