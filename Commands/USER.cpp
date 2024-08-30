@@ -51,6 +51,8 @@ void USER::execute(Server& server, Client& client) {
 }
 
 bool	USER::checkUserName(const string& userName) {
+	if (userName.empty())
+		return false;
 	for (string::const_iterator it = userName.begin() + 1; it != userName.end(); it++)
 		if (!isalnum(*it))
 			return false;
@@ -59,6 +61,8 @@ bool	USER::checkUserName(const string& userName) {
 
 bool	USER::checkRealName(const string& realName) {
 	string allowChar(": ");
+	if (realName.empty())
+		return false;
 	for (string::const_iterator it = realName.begin() + 1; it != realName.end(); it++)
 		if (!isalnum(*it) && allowChar.find(*it) == string::npos)
 			return false;
