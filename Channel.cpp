@@ -64,7 +64,7 @@ vector<Client*>	Channel::getOper() const
 	return this->_operators;
 }
 
-vector<string>	Channel::getInvites() const
+vector<Client*>	Channel::getInvites() const
 {
 	return this->_invites;
 }
@@ -219,34 +219,34 @@ void	Channel::broadcast(string msg, Client* except_client)
 	}
 }
 
-void	Channel::invite(string nick)
+void	Channel::invite(Client* user)
 {
 	for (size_t i = 0; i < _invites.size(); ++i)
 	{
-		if (_invites[i] == nick)
+		if (_invites[i]->getNickName() == user->getNickName())
 			return;
 	}
-	_invites.push_back(nick);
+	_invites.push_back(user);
 }
 
-void	Channel::accept(string nick)
+void	Channel::accept(Client* user)
 {
 	for (size_t i = 0; i < _invites.size(); ++i)
 	{
-		if (_invites[i] == nick)
+		if (_invites[i]->getNickName() == user->getNickName())
 		{
 			_invites.erase(_invites.begin() + i);
 			return ;
 		}
 	}
-	cout << "[ERROR][" << _getTimestamp() << "][Channel: " << _name << "] " << nick << " is not invited.\n";
+	cout << "[ERROR][" << _getTimestamp() << "][Channel: " << _name << "] " << user->getNickName() << " is not invited.\n";
 }
 
 int Channel::isInvited(string nick)
 {
 	for (size_t i = 0; i < _invites.size(); ++i)
 	{
-		if (_invites[i] == nick)
+		if (_invites[i]->getNickName() == nick)
 			return (1);
 	}
 	return (0);
@@ -321,7 +321,7 @@ int		Channel::_exist(vector<Client*> group, string nick) const
 std::ostream&	operator<<(std::ostream& os, const Channel& ch)
 {
 	vector<Client*> users = ch.getUsers();
-	vector<string> invites = ch.getInvites();
+	vector<Client*> invites = ch.getInvites();
 	os << "----------------------------------------------------\n";
 	os << "[INFO][" << ch._getTimestamp() << "][Channel: " << ch.getName() << "] Summary: \n";
 	os << "\t - Channel Mode Settings\n";
@@ -337,7 +337,7 @@ std::ostream&	operator<<(std::ostream& os, const Channel& ch)
 	os << "\t - Current Invites (" << invites.size() << "):\n";
 	for (size_t i = 0; i < invites.size(); ++i)
 	{
-		os << "\t\t [" << i + 1 << "] Name: " << invites[i] << "\n";
+		os << "\t\t [" << i + 1 << "] Name: " << invites[i]->getNickName() << "\n";
 	}
 	os << "----------------------------------------------------\n";
 	return os;

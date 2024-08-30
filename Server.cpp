@@ -164,6 +164,8 @@ void	Server::disconnect_client(int client_fd)
 					if (_channels[j]->getUsers().size() == 0)
 						deleteChannel(_channels[j]->getName());
 				}
+				if (_channels[j]->isInvited(cl->getNickName()))
+					_channels[j]->accept(cl);
 			}
 			_clients.erase(_clients.begin() + i);
 			break;

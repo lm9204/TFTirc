@@ -51,7 +51,7 @@ void	INVITE::execute(Server& server, Client& client)
 			client.send(makeNumericMsg(server, client, invitee, ERR_NOSUCHNICK));
 			return ;
 		}
-		ch->invite(invitee);
+		ch->invite(target);
 		client.send(":" + server.getServername() + " 341 " + inviter + " " + invitee + " " + ch_name + "\r\n");
 		
 	}
