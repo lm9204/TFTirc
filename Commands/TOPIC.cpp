@@ -36,6 +36,7 @@ void	TOPIC::execute(Server& server, Client& client)
 				msg += "332 " + client.getNickName() + " " + ch->getName() + " :" + ch->getTopic() + "\r\n";
 				msg += ":" + server.getServername() + " 333 " + client.getNickName() + " " + ch->getName() + " " + ch->getTopicByWho() + " " + ch->getTopicChangedTime() + "\r\n";
 			}
+			client.send(msg);
 		}
 		else
 		{
@@ -45,7 +46,6 @@ void	TOPIC::execute(Server& server, Client& client)
 			{
 				ch->setTopic(_cmdSource[2], client.who());
 			}
-
 			vector<Client*> users = ch->getUsers();
 			for (size_t i = 0; i < users.size(); ++i)
 			{
