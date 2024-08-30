@@ -153,7 +153,6 @@ int		Client::send(const string& msg) const
 		cerr << "client write error\n";
 		return (0);
 	}
-	cout << "[INFO][" << Server::_getTimestamp() << "] SNED: " << msg.substr(0, msg.size() - 2) << " by " << _fd << "th fd.\n"; 
 	return (1);
 }
 
