@@ -44,6 +44,7 @@ class Server
 		Channel*	getChannel(string ch_name);
 
 		static string	_getTimestamp();
+		void	handle_error(string err);
 
 	private:
 		//error Client(-1)
@@ -62,6 +63,5 @@ class Server
 
 };
 
-void	handle_error(string err);
 
 #endif
