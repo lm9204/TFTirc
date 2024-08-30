@@ -11,6 +11,7 @@
 
 # include "Client.hpp"
 # include "Channel.hpp"
+# include "Bot.hpp"
 # include "CommandController.hpp"
 
 
@@ -18,6 +19,7 @@
 # define HOST "TFTirc"
 
 class CommandController;
+class Bot;
 
 using namespace std;
 class Server
