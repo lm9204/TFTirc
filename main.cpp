@@ -2,7 +2,7 @@
 
 int main(int argc, char* argv[])
 {
-	if (argc < 3 || argc > 4 || atoi(argv[1]) == -1)
+	if (argc != 3 || atoi(argv[1]) == -1 || strlen(argv[2]) == 0)
 		return (1);
 	
 	Server server(atoi(argv[1]), argv[2]);
