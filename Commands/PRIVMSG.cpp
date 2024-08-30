@@ -28,22 +28,25 @@ void PRIVMSG::execute(Server& server, Client& client) {
 		client.send(makeNumericMsg(server, client, ERR_NEEDMOREPARAMS));
 		return ;
 	}
+	string command = this->_cmdSource[0];
+	string targetClientName;
+	string msg = this->_cmdSource[2];
 	fillSendTarget();
 	for (vector<string>::iterator it = this->sendTarget.begin(); it != this->sendTarget.end(); it++) {
-		this->_cmdSource[1] = *it;
-		if (this->_cmdSource[1][0] != '#') {
-			Client* targetClient = server.getClient(this->_cmdSource[1]);
+		targetClientName = *it;
+		if (targetClientName[0] != '#') {
+			Client* targetClient = server.getClient(targetClientName);
 			if (targetClient == NULL) {
-				client.send(makeNumericMsg(server, client, this->_cmdSource[1], ERR_NOSUCHNICK));
+				client.send(makeNumericMsg(server, client, targetClientName, ERR_NOSUCHNICK));
 			} else {
-				targetClient->send(":" + client.who() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + " " + this->_cmdSource[2] + "\r\n");
+				targetClient->send(":" + client.who() + " " + command + " " + targetClientName + " " + ":" + msg + "\r\n");
 			}
-		} else if (this->_cmdSource[1][0] == '#') {
-			Channel* targetChannel = server.getChannel(this->_cmdSource[1]);
+		} else if (targetClientName[0] == '#') {
+			Channel* targetChannel = server.getChannel(targetClientName);
 			if (targetChannel == NULL) {
-				client.send(makeNumericMsg(server, client, this->_cmdSource[1], ERR_CANNOTSENDTOCHAN));
+				client.send(makeNumericMsg(server, client, targetClientName, ERR_CANNOTSENDTOCHAN));
 			} else {
-				targetChannel->broadcast(":" + client.who() + " " + this->_cmdSource[0] + " " + this->_cmdSource[1] + " " + this->_cmdSource[2] + "\r\n", &client);
+				targetChannel->broadcast(":" + client.who() + " " + command + " " + targetClientName + " " + ":" + msg + "\r\n", &client);
 			}
 		}
 	}
