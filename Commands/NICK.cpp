@@ -61,6 +61,9 @@ void NICK::execute(Server& server, Client& client) {
 	if (client.getNickName() == "*" && client.getUserName() != "" && client.getRealName() != "") {
 		client.setNickName(nickName);
 		client.send(makeNumericMsg(server, client, RPL_WELCOME));
+		Client* bot = server.getClient(BOT_NAME);
+		if (bot != NULL)
+			client.send(":" + bot->who() + " " + "PRIVMSG" + " " + client.getNickName() + " " + ":저는 럭키비키니시티봇 입니다~~🍀" + "\r\n");
 		return ;
 	}
 	client.setNickName(nickName);

@@ -11,7 +11,7 @@ Bot::~Bot() {
 
 }
 
-int		Bot::send(const string& msg) const {
+int	Bot::send(const string& msg) const {
 	istringstream iss(msg);
 	string source, command, client, mssage, targetNickname;
 
@@ -21,6 +21,7 @@ int		Bot::send(const string& msg) const {
 	iss.str(source.substr(1, source.size() - 1));
 	iss >> targetNickname;
 
+	mssage = mssage.substr(1, mssage.size() - 1);
 	mssage = mssage.substr(0, mssage.size() - 2);
 	mssage += "? 완전 럭키비키잖아~~🍀";
 	Client* targetClient = this->server->getClient(targetNickname);
