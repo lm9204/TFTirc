@@ -89,7 +89,7 @@ int	MODE::check_cmd(Server& server, Channel	&channel, Client& client)
 			client.send(makeNumericMsg(server, client, "401"));
 			return (false);
 		}
-		temp = server.getClient(_key);
+		temp = channel.getClient(_key);
 		if (_flag == true && channel.isOper(temp) == true)
 			return (false);
 		if (_flag == false && channel.isOper(temp) == false)
