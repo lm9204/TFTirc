@@ -69,7 +69,7 @@ void JOIN::execute(Server& server, Client& client) {
 
 		if (!newChannel)
 			channel->join(&client);
-		channel->broadcast(":" + client.getNickName() + "!~" + client.getUserName() + "@" + client.getHostName() + " " + "JOIN" + " " + channelName + "\r\n");
+		channel->broadcast(":" + client.who() + " " + "JOIN" + " " + channelName + "\r\n");
 		client.send(makeNumericMsg(server, client, *channel, RPL_TOPIC));
 		client.send(makeNumericMsg(server, client, *channel, RPL_NAMREPLY));
 		client.send(makeNumericMsg(server, client, *channel, RPL_ENDOFNAMES));

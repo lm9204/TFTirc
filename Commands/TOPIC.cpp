@@ -8,16 +8,16 @@ void	TOPIC::execute(Server& server, Client& client)
 {
 	if (!isRegisterClient(server, client))
 		return ;
+	if (_cmdSource.size() < 2)
+	{
+		client.send(makeNumericMsg(server, client, "461"));
+		return ;
+	}
 	string msg = ":" + server.getServername() + " ";
 	Channel* ch = server.getChannel(_cmdSource[1]);
 	if (ch == NULL)
 	{
 		client.send(makeNumericMsg(server, client, _cmdSource[1], "403"));
-		return ;
-	}
-	if (_cmdSource.size() < 2)
-	{
-		client.send(makeNumericMsg(server, client, "461"));
 		return ;
 	}
 	if (!ch->checkUserInChannel(client.getNickName()))
