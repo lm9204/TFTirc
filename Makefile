@@ -7,6 +7,7 @@ SRCS =	main.cpp \
 		Server.cpp \
 		Client.cpp \
 		Channel.cpp \
+		Bot.cpp \
 		Commands/CommandController.cpp \
 		Commands/Command.cpp \
 		Commands/NICK.cpp \
