@@ -130,7 +130,15 @@ void	Server::debugger()
 		{
 			for (vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
 			{
-				cout << (*it);
+				cout << *(*it);
+			}
+		}
+		else if (cmd == "showallc")
+		{
+			for (vector<Channel*>::const_iterator it = _channels.begin(); it != _channels.end(); ++it)
+			{
+			
+				cout << *(*it);
 			}
 		}
 		else

@@ -78,18 +78,15 @@ string	Client::getBuf() const
 
 string	Client::getCommand()
 {
-	string			input(_buf);
-	string			buffer;
-	string			line;
-	string			command;
-	istringstream	iss(input);
+	string buffer;
+	size_t crlf_pos;
 
-	if (_buf.find("\r\n") == string::npos)
-		return ("no_comand");
-	getline(iss, buffer);
-	buffer = buffer.substr(0, input.find("\r\n"));
-	_buf = _buf.substr(input.find("\r\n") + 2, input.size() - 1);
-	return (buffer);
+	crlf_pos = _buf.find("\r\n");
+	if (crlf_pos == string::npos)
+		return "";
+	buffer = _buf.substr(0, crlf_pos);
+	_buf = _buf.substr(crlf_pos + 2);
+	return buffer;
 }
 
 void		Client::setNickName(string nick)

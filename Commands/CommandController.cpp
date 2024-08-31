@@ -39,42 +39,50 @@ CommandController::~CommandController() {
 }
 
 vector<string> CommandController::cmdSplit(string cmd) {
+	vector<string> res;
+	istringstream iss;
 	string beforeColon;
 	string afterColon;
-	istringstream iss;
-	vector<string> res;
 	string tmp;
+	size_t colon_pos = 0;
+	bool flag = false;
 
-	try {
-		beforeColon = cmd.substr(0, cmd.find(":", 0));
-		afterColon = cmd.substr(cmd.find(":", 0));
-		afterColon = afterColon.substr(1, afterColon.size() - 1);
-		iss.str(beforeColon);
-	} catch (exception& e) {
-		beforeColon = "";
-		afterColon = "";
-		iss.str(cmd);
+	for (colon_pos = 0; colon_pos < cmd.size(); colon_pos++) {
+		if (!flag && cmd[colon_pos] == ':')
+			break ;
+		if (cmd[colon_pos] == '#')
+			flag = true;
+		if (cmd[colon_pos] == ' ')
+			flag = false;
 	}
+	if (colon_pos < cmd.size()) {
+		beforeColon = cmd.substr(0, colon_pos);
+		afterColon = cmd.substr(colon_pos);
+		afterColon = afterColon.substr(1);
+		iss.str(beforeColon);
+	} else
+		iss.str(cmd);
 	while (!iss.eof()) {
+		// getline(iss, tmp, ' ');
 		iss >> tmp;
 		if (tmp != "")
 			res.push_back(tmp);
 		tmp = "";
 	}
-	if (afterColon != "")
+	if (colon_pos != cmd.size())
 		res.push_back(afterColon);
 	return res;
 }
 
 Command* CommandController::makeCommand(Client& client) {
 	string cmd = client.getCommand();
-	if (cmd == "no_comand")
+	if (cmd == "")
 		return NULL;
 	vector<string> cmds = cmdSplit(cmd);
 	if (cmds.empty())
 		return NULL;
-	// for (int i = 0; i < static_cast<int>(cmds.size()); i++)
-	// 	cout << "[" << i << "]: " << cmds[i] << std::endl;
+	for (int i = 0; i < static_cast<int>(cmds.size()); i++)
+		cout << "[" << i << "]: " << cmds[i] << std::endl;
 	Command* command = this->_commands[cmds[0]];
 	if(command == NULL)
 		command = this->_commands["UNKNOWN"];
