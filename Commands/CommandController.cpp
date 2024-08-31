@@ -81,8 +81,6 @@ Command* CommandController::makeCommand(Client& client) {
 	vector<string> cmds = cmdSplit(cmd);
 	if (cmds.empty())
 		return NULL;
-	for (int i = 0; i < static_cast<int>(cmds.size()); i++)
-		cout << "[" << i << "]: " << cmds[i] << std::endl;
 	Command* command = this->_commands[cmds[0]];
 	if(command == NULL)
 		command = this->_commands["UNKNOWN"];

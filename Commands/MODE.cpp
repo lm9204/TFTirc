@@ -112,14 +112,31 @@ void	MODE::execute(Server& server, Client& client)
 
 	if (!isRegisterClient(server, client))
 		return ;
+	if (this->_cmdSource.size() < 2) {
+		client.send(makeNumericMsg(server, client, ERR_NEEDMOREPARAMS));
+		return ;
+	}
 	if (_cmdSource[1][0] != '#')
 	{
-		client.send(":" + client.getHostName() + " 221 " + _cmdSource[1] + " " + _cmdSource[2] + "\r\n");
+		// :iridium.libera.chat 502 tajeong :Can't change mode for other users
+		Client* targetClient = server.getClient(_cmdSource[1]);
+		if (targetClient == NULL) {
+			client.send(makeNumericMsg(server, client, _cmdSource[1], ERR_NOSUCHNICK));
+			return ;
+		}
+		if (client.getNickName() != targetClient->getNickName()) {
+			client.send(makeNumericMsg(server, client, ERR_USERSDONTMATCH));
+			return ;
+		}
+		if (this->_cmdSource.size() < 3) {
+			client.send(makeNumericMsg(server, client, ERR_NEEDMOREPARAMS));
+			return ;
+		}
+		client.send(":" + client.getHostName() + " " + _cmdSource[1] + " " + _cmdSource[2] + "\r\n");
 		return ;
 	}
 	name = _cmdSource[1];
 	_flag = -1;
-	// 인자 초기화가 안되어있음.
 	_key = "";
 	_limit = 0;
 	_mode = 0;
