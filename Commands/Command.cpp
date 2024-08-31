@@ -42,6 +42,8 @@ const string Command::makeNumericMsg(Server& server, Client& client, const strin
 		res += client.getNickName() + " " + ":You have not registered";
 	} else if (num == ERR_PASSWDMISMATCH) {
 		res += client.getNickName() + " " + ":Password incorrect";
+	} else if (num == ERR_USERSDONTMATCH) {
+		res += client.getNickName() + " " + ":Can't change mode for other users";
 	} else {
 		return "";
 	}
