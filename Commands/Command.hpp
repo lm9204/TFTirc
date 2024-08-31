@@ -31,6 +31,7 @@
 # define ERR_INVITEONLYCHAN			"473"
 # define ERR_BADCHANMASK			"476"
 # define ERR_CHANOPRIVSNEEDED		"482"
+# define ERR_USERSDONTMATCH			"502"
 
 using namespace std;
 
